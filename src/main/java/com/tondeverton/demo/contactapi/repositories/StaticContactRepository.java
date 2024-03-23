@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
+
 @Repository
 public class StaticContactRepository implements ContactRepository {
 
@@ -34,7 +36,7 @@ public class StaticContactRepository implements ContactRepository {
         contact.setPhoneNumber(toInsert.getPhoneNumber());
         contact.setEmail(toInsert.getEmail());
 
-        contact.setId(UUID.randomUUID());
+        contact.setId(randomUUID());
 
         return contact;
     }
