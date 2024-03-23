@@ -9,5 +9,5 @@ public interface ContactRepository {
     Optional<Contact> getById(UUID id);
     Collection<Contact> getAllBySearch(String search);
     Optional<Contact> update(UUID id, ContactToInsert contact);
-    void deleteById(UUID id);
+    boolean deleteById(UUID id);
 }

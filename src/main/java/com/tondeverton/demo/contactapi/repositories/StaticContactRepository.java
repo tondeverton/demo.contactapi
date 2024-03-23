@@ -13,9 +13,9 @@ import java.util.UUID;
 @Repository
 public class StaticContactRepository implements ContactRepository {
 
-    private static Collection<Contact> contacts;
+    private static Collection<ContactEntity> contacts;
 
-    private StringSimilarityUtil stringSimilarity;
+    private final StringSimilarityUtil stringSimilarity;
 
     public StaticContactRepository(
             @Autowired(required = false) StringSimilarityUtil stringSimilarity
@@ -26,35 +26,52 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Contact add(ContactToInsert contact) {
-        return null;
+    public Contact add(ContactToInsert toInsert) {
+        var contact = new ContactEntity();
+        contact.setFirstName(toInsert.getFirstName());
+        contact.setLastName(toInsert.getLastName());
+        contact.setDisplayName(toInsert.getDisplayName());
+        contact.setPhoneNumber(toInsert.getPhoneNumber());
+        contact.setEmail(toInsert.getEmail());
+
+        contact.setId(UUID.randomUUID());
+
+        return contact;
     }
 
     @Override
     public Optional<Contact> getById(UUID id) {
-        return contacts.stream().toList().stream().filter(c -> id.equals(c.getId())).findFirst();
+        return contacts.stream().filter(c -> id.equals(c.getId())).findFirst().map(c -> c);
     }
 
     @Override
     public Collection<Contact> getAllBySearch(String search) {
         return contacts.stream().filter(c -> {
-            var contactProperties = "".concat(c.firstName())
-                    .concat(" ").concat(c.lastName())
-                    .concat(" ").concat(c.displayName())
-                    .concat(" ").concat(c.phoneNumber())
-                    .concat(" ").concat(c.email());
+            var contactProperties = "".concat(c.getFirstName())
+                    .concat(" ").concat(c.getLastName())
+                    .concat(" ").concat(c.getDisplayName())
+                    .concat(" ").concat(c.getPhoneNumber())
+                    .concat(" ").concat(c.getEmail());
 
             return stringSimilarity.percentageBetween(search, contactProperties) > 30;
-        }).toList();
+        }).map(c -> (Contact) c).toList();
     }
 
     @Override
-    public Optional<Contact> update(UUID id, ContactToInsert contact) {
-        return null;
+    public Optional<Contact> update(UUID id, ContactToInsert toInsert) {
+        var contact = contacts.stream().findFirst();
+        contact.ifPresent(c -> {
+            c.setFirstName(toInsert.getFirstName());
+            c.setLastName(toInsert.getLastName());
+            c.setDisplayName(toInsert.getDisplayName());
+            c.setPhoneNumber(toInsert.getPhoneNumber());
+            c.setEmail(toInsert.getEmail());
+        });
+        return contact.map(c -> c);
     }
 
     @Override
-    public void deleteById(UUID id) {
-
+    public boolean deleteById(UUID id) {
+        return contacts.removeIf(c -> id.equals(c.getId()));
     }
 }

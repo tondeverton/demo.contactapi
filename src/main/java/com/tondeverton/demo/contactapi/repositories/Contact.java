@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public interface Contact {
     UUID getId();
-    String firstName();
-    String lastName();
-    String displayName();
-    String phoneNumber();
-    String email();
+    String getFirstName();
+    String getLastName();
+    String getDisplayName();
+    String getPhoneNumber();
+    String getEmail();
 }
