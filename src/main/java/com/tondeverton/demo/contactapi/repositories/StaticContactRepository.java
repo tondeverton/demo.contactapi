@@ -47,7 +47,7 @@ public class StaticContactRepository implements ContactRepository {
     @Override
     public Collection<Contact> getAllBySearch(String search) {
         return contacts.stream().filter(c -> {
-            var contactProperties = "".concat(c.getFirstName())
+            var contactProperties = c.getFirstName()
                     .concat(" ").concat(c.getLastName())
                     .concat(" ").concat(c.getDisplayName())
                     .concat(" ").concat(c.getPhoneNumber())
