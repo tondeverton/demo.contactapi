@@ -1,5 +1,6 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import com.tondeverton.demo.contactapi.testutilities.Faker;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,19 +27,24 @@ public class StaticContactRepositoryTest {
     void add_givenSomeContactToInsert_shouldReturnsContactWithTheSamePropertiesFromInput() {
         var toInsert = mock(ContactToInsert.class);
 
-        when(toInsert.getFirstName()).thenReturn("a");
-        when(toInsert.getLastName()).thenReturn("b");
-        when(toInsert.getDisplayName()).thenReturn("c");
-        when(toInsert.getPhoneNumber()).thenReturn("1");
-        when(toInsert.getEmail()).thenReturn("@");
+        var someFirstName = Faker.firstName();
+        when(toInsert.getFirstName()).thenReturn(someFirstName);
+        var someLastName = Faker.lastName();
+        when(toInsert.getLastName()).thenReturn(someLastName);
+        var someDisplayName = Faker.nickname();
+        when(toInsert.getDisplayName()).thenReturn(someDisplayName);
+        var somePhoneNumber = Faker.phoneNumber();
+        when(toInsert.getPhoneNumber()).thenReturn(somePhoneNumber);
+        var someEmail = Faker.email();
+        when(toInsert.getEmail()).thenReturn(someEmail);
 
         var persisted = repository.add(toInsert);
 
-        assertEquals("a", persisted.getFirstName());
-        assertEquals("b", persisted.getLastName());
-        assertEquals("c", persisted.getDisplayName());
-        assertEquals("1", persisted.getPhoneNumber());
-        assertEquals("@", persisted.getEmail());
+        assertEquals(someFirstName, persisted.getFirstName());
+        assertEquals(someLastName, persisted.getLastName());
+        assertEquals(someDisplayName, persisted.getDisplayName());
+        assertEquals(somePhoneNumber, persisted.getPhoneNumber());
+        assertEquals(someEmail, persisted.getEmail());
     }
 
     @Test
