@@ -38,6 +38,8 @@ public class StaticContactRepository implements ContactRepository {
 
         contact.setId(randomUUID());
 
+        contacts.add(contact);
+
         return contact;
     }
 
