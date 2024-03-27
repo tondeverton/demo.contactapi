@@ -1,9 +1,12 @@
 package com.tondeverton.demo.contactapi.repositories;
 
 import com.tondeverton.demo.contactapi.testutilities.Faker;
+import com.tondeverton.demo.contactapi.testutilities.FakerFactory;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,5 +115,44 @@ public class StaticContactRepositoryTest {
 
         assertNotEquals(0L, contact.getId().getMostSignificantBits());
         assertNotEquals(0L, contact.getId().getLeastSignificantBits());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentGreaterThanMinOfThreeExistentContacts(
+            int contactToReturn
+    ) {
+        var contactOne = repository.add(FakerFactory.contactToInsert());
+        var contactTwo = repository.add(FakerFactory.contactToInsert());
+        var contactThree = repository.add(FakerFactory.contactToInsert());
+
+        var anySearch = Faker.word();
+        var anyMinPercentSimilarity = (double) Faker.intBetween(5, 95);
+
+        var greaterThanPercentSimilarity = anyMinPercentSimilarity + 1;
+        var lowerThanPercentSimilarity = anyMinPercentSimilarity - 1;
+        when(stringSimilarity.percentageBetween(anyString(), anyString()))
+                .thenReturn(
+                        contactToReturn == 1 ? greaterThanPercentSimilarity : lowerThanPercentSimilarity,
+                        contactToReturn == 2 ? greaterThanPercentSimilarity : lowerThanPercentSimilarity,
+                        contactToReturn == 3 ? greaterThanPercentSimilarity : lowerThanPercentSimilarity
+                );
+
+        var contacts = repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+
+        assertEquals(1, contacts.size());
+
+        var contactId = contacts.stream().findFirst().get().getId();
+        switch (contactToReturn) {
+            case 1:
+                assertEquals(contactOne.getId(), contactId);
+                break;
+            case 2:
+                assertEquals(contactTwo.getId(), contactId);
+                break;
+            case 3:
+                assertEquals(contactThree.getId(), contactId);
+                break;
+        }
     }
 }

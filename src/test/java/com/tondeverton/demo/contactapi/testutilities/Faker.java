@@ -25,4 +25,12 @@ public class Faker {
     public static String email() {
         return dataFactory.getEmailAddress();
     }
+
+    public static String word() {
+        return dataFactory.getRandomWord();
+    }
+
+    public static int intBetween(int min, int max) {
+        return dataFactory.getNumberBetween(min, max);
+    }
 }

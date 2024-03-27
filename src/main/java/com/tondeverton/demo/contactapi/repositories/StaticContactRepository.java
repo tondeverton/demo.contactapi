@@ -49,7 +49,7 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Collection<Contact> getAllBySearch(String search) {
+    public Collection<Contact> getAllBySearch(String search, double minPercentSimilarity) {
         return contacts.stream().filter(c -> {
             var contactProperties = c.getFirstName()
                     .concat(" ").concat(c.getLastName())
@@ -57,7 +57,7 @@ public class StaticContactRepository implements ContactRepository {
                     .concat(" ").concat(c.getPhoneNumber())
                     .concat(" ").concat(c.getEmail());
 
-            return stringSimilarity.percentageBetween(search, contactProperties) > 30;
+            return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
         }).map(c -> (Contact) c).toList();
     }
 
