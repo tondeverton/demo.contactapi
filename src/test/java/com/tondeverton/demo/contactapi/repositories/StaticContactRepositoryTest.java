@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -154,5 +155,63 @@ public class StaticContactRepositoryTest {
                 assertEquals(contactThree.getId(), contactId);
                 break;
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentEqualToMinOfThreeExistentContacts(
+            int contactToReturn
+    ) {
+        var contactOne = repository.add(FakerFactory.contactToInsert());
+        var contactTwo = repository.add(FakerFactory.contactToInsert());
+        var contactThree = repository.add(FakerFactory.contactToInsert());
+
+        var anySearch = Faker.word();
+        var anyMinPercentSimilarity = (double) Faker.intBetween(5, 95);
+
+        var lowerThanPercentSimilarity = anyMinPercentSimilarity - 1;
+        when(stringSimilarity.percentageBetween(anyString(), anyString()))
+                .thenReturn(
+                        contactToReturn == 1 ? anyMinPercentSimilarity : lowerThanPercentSimilarity,
+                        contactToReturn == 2 ? anyMinPercentSimilarity : lowerThanPercentSimilarity,
+                        contactToReturn == 3 ? anyMinPercentSimilarity : lowerThanPercentSimilarity
+                );
+
+        var contacts = repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+
+        assertEquals(1, contacts.size());
+
+        var contactId = contacts.stream().findFirst().get().getId();
+        switch (contactToReturn) {
+            case 1:
+                assertEquals(contactOne.getId(), contactId);
+                break;
+            case 2:
+                assertEquals(contactTwo.getId(), contactId);
+                break;
+            case 3:
+                assertEquals(contactThree.getId(), contactId);
+                break;
+        }
+    }
+
+    @Test
+    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldProvidesForStringSimilarityAllDataFromContactToInsert() {
+        var contact = repository.add(FakerFactory.contactToInsert());
+        var expectedContactProperties = contact.getFirstName()
+                .concat(" ").concat(contact.getLastName())
+                .concat(" ").concat(contact.getDisplayName())
+                .concat(" ").concat(contact.getPhoneNumber())
+                .concat(" ").concat(contact.getEmail());
+
+        var anySearch = Faker.word();
+        var anyMinPercentSimilarity = (double) Faker.intBetween(5, 95);
+
+        var contactPropertiesCaptor = ArgumentCaptor.forClass(String.class);
+
+        when(stringSimilarity.percentageBetween(anyString(), contactPropertiesCaptor.capture())).thenReturn(anyMinPercentSimilarity);
+        repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+
+        assertEquals(expectedContactProperties, contactPropertiesCaptor.getValue());
     }
 }
