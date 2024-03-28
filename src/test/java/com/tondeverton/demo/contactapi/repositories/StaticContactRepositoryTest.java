@@ -8,24 +8,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 public class StaticContactRepositoryTest {
 
-    private final StringSimilarityUtil stringSimilarity;
-    private final StaticContactRepository repository;
-
-    public StaticContactRepositoryTest() {
-        stringSimilarity = mock(StringSimilarityUtil.class);
-        this.repository = new StaticContactRepository(stringSimilarity);
-    }
+    @MockBean
+    private StringSimilarityUtil stringSimilarity;
+    @Autowired
+    private StaticContactRepository repository;
 
     @BeforeEach
-    public void resetMocks() {
-        reset(stringSimilarity);
+    public void clearContactList() {
+        StaticContactRepository.contacts.clear();
     }
 
     @Test
@@ -54,7 +55,7 @@ public class StaticContactRepositoryTest {
 
     @Test
     void add_givenAnyContactToInsert_shouldReturnsContactWithNotBlankId() {
-        var toInsert = mock(ContactToInsert.class);
+        var toInsert = FakerFactory.contactToInsert();
 
         var persisted = repository.add(toInsert);
 
@@ -72,7 +73,7 @@ public class StaticContactRepositoryTest {
 
     @Test
     void getById__givenExistentId__shouldReturnsPresentOptional() {
-        var toInsert = mock(ContactToInsert.class);
+        var toInsert = FakerFactory.contactToInsert();
         var persisted = repository.add(toInsert);
         var existentId = persisted.getId();
 
@@ -108,7 +109,7 @@ public class StaticContactRepositoryTest {
 
     @Test
     void getById__givenExistentIdAndEarlierAnyContactAdded__shouldReturnsPresentOptionalWithNotBlankId() {
-        var toInsert = mock(ContactToInsert.class);
+        var toInsert = FakerFactory.contactToInsert();
 
         var existentId = repository.add(toInsert).getId();
 
@@ -213,5 +214,69 @@ public class StaticContactRepositoryTest {
         repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
 
         assertEquals(expectedContactProperties, contactPropertiesCaptor.getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "firstName",
+            "lastName",
+            "displayName",
+            "phoneNumber",
+            "email"
+    })
+    void add__givenSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
+        var contact = FakerFactory.contactToInsert();
+        switch (blankAttribute) {
+            case "firstName":
+                when(contact.getFirstName()).thenReturn("");
+                break;
+            case "lastName":
+                when(contact.getLastName()).thenReturn("");
+                break;
+            case "displayName":
+                when(contact.getDisplayName()).thenReturn("");
+                break;
+            case "phoneNumber":
+                when(contact.getPhoneNumber()).thenReturn("");
+                break;
+            case "email":
+                when(contact.getEmail()).thenReturn("");
+                break;
+        }
+
+        var exception = assertThrows(Exception.class, () -> repository.add(contact));
+        assertTrue(exception.getMessage().contains(blankAttribute));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "firstName",
+            "lastName",
+            "displayName",
+            "phoneNumber",
+            "email"
+    })
+    void update__givenAnyIdAndAndSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
+        var contact = FakerFactory.contactToInsert();
+        switch (blankAttribute) {
+            case "firstName":
+                when(contact.getFirstName()).thenReturn("");
+                break;
+            case "lastName":
+                when(contact.getLastName()).thenReturn("");
+                break;
+            case "displayName":
+                when(contact.getDisplayName()).thenReturn("");
+                break;
+            case "phoneNumber":
+                when(contact.getPhoneNumber()).thenReturn("");
+                break;
+            case "email":
+                when(contact.getEmail()).thenReturn("");
+                break;
+        }
+
+        var exception = assertThrows(Exception.class, () -> repository.update(randomUUID(), contact));
+        assertTrue(exception.getMessage().contains(blankAttribute));
     }
 }

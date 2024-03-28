@@ -1,13 +1,21 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+@Validated
 public interface ContactRepository {
-    Contact add(ContactToInsert contact);
+    Contact add(@Valid ContactToInsert contact);
+
     Optional<Contact> getById(UUID id);
+
     Collection<Contact> getAllBySearch(String search, double minPercentSimilarity);
-    Optional<Contact> update(UUID id, ContactToInsert contact);
+
+    Optional<Contact> update(UUID id, @Valid ContactToInsert contact);
+
     boolean deleteById(UUID id);
 }
