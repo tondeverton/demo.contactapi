@@ -9,7 +9,7 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
     public static final String REGEX_ONLY_NUMBERS = "[0-9]+";
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.isBlank()) {
             return true;
         }

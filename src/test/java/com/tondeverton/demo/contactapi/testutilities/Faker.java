@@ -30,6 +30,14 @@ public class Faker {
         return dataFactory.getRandomWord();
     }
 
+    public static String word(int length) {
+        return dataFactory.getRandomWord(length);
+    }
+
+    public static String number(int digits) {
+        return dataFactory.getNumberText(digits);
+    }
+
     public static int intBetween(int min, int max) {
         return dataFactory.getNumberBetween(min, max);
     }
