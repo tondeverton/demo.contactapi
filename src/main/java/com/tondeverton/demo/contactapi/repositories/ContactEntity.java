@@ -2,7 +2,7 @@ package com.tondeverton.demo.contactapi.repositories;
 
 import java.util.UUID;
 
-public class ContactEntity implements Contact {
+public class ContactEntity implements Contact, ContactToInsert, Cloneable {
 
     private UUID id;
     private String firstName;
@@ -63,5 +63,14 @@ public class ContactEntity implements Contact {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public ContactEntity clone() {
+        try {
+            return (ContactEntity) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

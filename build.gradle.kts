@@ -26,6 +26,7 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.graphql:spring-graphql-test")
     testImplementation("org.fluttercode.datafactory:datafactory:0.8")
+    testImplementation("org.assertj:assertj-core:3.25.3")
 }
 
 tasks.withType<Test> {

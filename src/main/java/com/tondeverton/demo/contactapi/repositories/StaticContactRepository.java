@@ -2,22 +2,17 @@ package com.tondeverton.demo.contactapi.repositories;
 
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityLevenshtein;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.UUID.randomUUID;
 
 @Repository
 public class StaticContactRepository implements ContactRepository {
 
-    protected static final  Collection<ContactEntity> contacts = new ArrayList<>();
+    protected static final Collection<ContactEntity> contacts = new ArrayList<>();
 
     private final StringSimilarityUtil stringSimilarity;
 
@@ -46,6 +41,11 @@ public class StaticContactRepository implements ContactRepository {
     @Override
     public Optional<Contact> getById(UUID id) {
         return contacts.stream().filter(c -> id.equals(c.getId())).findFirst().map(c -> c);
+    }
+
+    @Override
+    public Collection<Contact> getAll() {
+        return contacts.stream().map(ContactEntity::clone).map(c -> (Contact) c).toList();
     }
 
     @Override

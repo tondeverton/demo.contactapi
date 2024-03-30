@@ -1,6 +1,9 @@
 package com.tondeverton.demo.contactapi.testutilities;
 
+import com.tondeverton.demo.contactapi.repositories.ContactEntity;
 import com.tondeverton.demo.contactapi.repositories.ContactToInsert;
+
+import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -8,13 +11,18 @@ import static org.mockito.Mockito.when;
 public class FakerFactory {
 
     public static ContactToInsert contactToInsert() {
-        var toInsert = mock(ContactToInsert.class);
-        when(toInsert.getFirstName()).thenReturn(Faker.firstName());
-        when(toInsert.getLastName()).thenReturn(Faker.lastName());
-        when(toInsert.getDisplayName()).thenReturn(Faker.nickname());
-        when(toInsert.getPhoneNumber()).thenReturn(Faker.phoneNumber());
-        when(toInsert.getEmail()).thenReturn(Faker.email());
+        return contactEntity();
+    }
 
-        return toInsert;
+    public static ContactEntity contactEntity() {
+        var contact = new ContactEntity();
+        contact.setId(UUID.randomUUID());
+        contact.setFirstName(Faker.firstName());
+        contact.setLastName(Faker.lastName());
+        contact.setDisplayName(Faker.nickname());
+        contact.setPhoneNumber(Faker.phoneNumber());
+        contact.setEmail(Faker.email());
+
+        return contact;
     }
 }

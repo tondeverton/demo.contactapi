@@ -13,6 +13,8 @@ public interface ContactRepository {
 
     Optional<Contact> getById(UUID id);
 
+    Collection<Contact> getAll();
+
     Collection<Contact> getAllBySearch(String search, double minPercentSimilarity);
 
     Optional<Contact> update(UUID id, @Valid ContactToInsert contact);

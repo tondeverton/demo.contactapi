@@ -12,7 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.System.*;
 import static java.util.UUID.randomUUID;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -117,6 +122,40 @@ public class StaticContactRepositoryTest {
 
         assertNotEquals(0L, contact.getId().getMostSignificantBits());
         assertNotEquals(0L, contact.getId().getLeastSignificantBits());
+    }
+
+    @Test
+    void getAll__shouldReturnsContactsWithTheSameDataFromStoredContacts() {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
+
+        var contacts = repository.getAll().toArray();
+
+        assertEquals(3, contacts.length);
+        assertThat(contacts[0]).usingRecursiveComparison().isEqualTo(contactOne);
+        assertThat(contacts[1]).usingRecursiveComparison().isEqualTo(contactTwo);
+        assertThat(contacts[2]).usingRecursiveComparison().isEqualTo(contactThree);
+    }
+
+    @Test
+    void getAll__shouldReturnsAClonedListWithClonedItems() {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
+
+        var contactsFromRepository = repository.getAll();
+
+        assertNotEquals(identityHashCode(StaticContactRepository.contacts), identityHashCode(contactsFromRepository));
+
+        var contactsAsArray = StaticContactRepository.contacts.toArray();
+        var contactsFromRepositoryAsArray = contactsFromRepository.toArray();
+
+        assertNotEquals(identityHashCode(contactsAsArray[0]), identityHashCode(contactsFromRepositoryAsArray[0]));
+        assertNotEquals(identityHashCode(contactsAsArray[1]), identityHashCode(contactsFromRepositoryAsArray[1]));
+        assertNotEquals(identityHashCode(contactsAsArray[2]), identityHashCode(contactsFromRepositoryAsArray[2]));
     }
 
     @ParameterizedTest
