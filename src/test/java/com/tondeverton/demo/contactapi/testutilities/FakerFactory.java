@@ -10,10 +10,6 @@ import static org.mockito.Mockito.when;
 
 public class FakerFactory {
 
-    public static ContactToInsert contactToInsert() {
-        return contactEntity();
-    }
-
     public static ContactEntity contactEntity() {
         var contact = new ContactEntity();
         contact.setId(UUID.randomUUID());
