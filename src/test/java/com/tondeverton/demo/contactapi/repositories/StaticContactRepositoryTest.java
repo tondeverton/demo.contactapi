@@ -399,6 +399,25 @@ public class StaticContactRepositoryTest {
         assertThat(exception.getMessage()).contains("must not be null");
     }
 
+    @Test
+    void update__givenNonExistentIdAndAnyContact__shouldReturnsNotPresentOptionalAndNotUpdateAnyContactsData() {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
+
+        var contact = repository.update(randomUUID(), FakerFactory.contactEntity());
+
+        assertFalse(contact.isPresent());
+        assertThat(StaticContactRepository.contacts).hasSize(3);
+
+        var contactsAsArray = StaticContactRepository.contacts.toArray();
+
+        assertThat(contactsAsArray[0]).usingRecursiveComparison().isEqualTo(contactOne);
+        assertThat(contactsAsArray[1]).usingRecursiveComparison().isEqualTo(contactTwo);
+        assertThat(contactsAsArray[2]).usingRecursiveComparison().isEqualTo(contactThree);
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2})
     void delete__givenExistentId__shouldReturnsTrueAndDeleteOnlyTheMatchedContactGivenThreeStore(int contactToDelete) {
