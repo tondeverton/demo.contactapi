@@ -79,6 +79,38 @@ public class StaticContactRepositoryTest {
         assertNotEquals(identityHashCode(StaticContactRepository.contacts.toArray()[0]), identityHashCode(persisted));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "firstName",
+            "lastName",
+            "displayName",
+            "phoneNumber",
+            "email"
+    })
+    void add__givenSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
+        var contact = spy(FakerFactory.contactToInsert());
+        switch (blankAttribute) {
+            case "firstName":
+                when(contact.getFirstName()).thenReturn("");
+                break;
+            case "lastName":
+                when(contact.getLastName()).thenReturn("");
+                break;
+            case "displayName":
+                when(contact.getDisplayName()).thenReturn("");
+                break;
+            case "phoneNumber":
+                when(contact.getPhoneNumber()).thenReturn("");
+                break;
+            case "email":
+                when(contact.getEmail()).thenReturn("");
+                break;
+        }
+
+        var exception = assertThrows(Exception.class, () -> repository.add(contact));
+        assertTrue(exception.getMessage().contains(blankAttribute));
+    }
+
     @Test
     void getById__givenNonExistentId__shouldReturnsNotPresentOptional() {
         var contact = repository.getById(randomUUID());
@@ -284,38 +316,6 @@ public class StaticContactRepositoryTest {
         assertNotEquals(identityHashCode(contactsAsArray[0]), identityHashCode(contactsFromRepositoryAsArray[0]));
         assertNotEquals(identityHashCode(contactsAsArray[1]), identityHashCode(contactsFromRepositoryAsArray[1]));
         assertNotEquals(identityHashCode(contactsAsArray[2]), identityHashCode(contactsFromRepositoryAsArray[2]));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "firstName",
-            "lastName",
-            "displayName",
-            "phoneNumber",
-            "email"
-    })
-    void add__givenSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
-        var contact = spy(FakerFactory.contactToInsert());
-        switch (blankAttribute) {
-            case "firstName":
-                when(contact.getFirstName()).thenReturn("");
-                break;
-            case "lastName":
-                when(contact.getLastName()).thenReturn("");
-                break;
-            case "displayName":
-                when(contact.getDisplayName()).thenReturn("");
-                break;
-            case "phoneNumber":
-                when(contact.getPhoneNumber()).thenReturn("");
-                break;
-            case "email":
-                when(contact.getEmail()).thenReturn("");
-                break;
-        }
-
-        var exception = assertThrows(Exception.class, () -> repository.add(contact));
-        assertTrue(exception.getMessage().contains(blankAttribute));
     }
 
     @ParameterizedTest
