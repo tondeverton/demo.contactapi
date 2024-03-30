@@ -5,7 +5,10 @@ import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 
@@ -51,14 +54,14 @@ public class StaticContactRepository implements ContactRepository {
     @Override
     public Collection<Contact> getAllBySearch(String search, double minPercentSimilarity) {
         return contacts.stream().filter(c -> {
-            var contactProperties = c.getFirstName()
-                    .concat(" ").concat(c.getLastName())
-                    .concat(" ").concat(c.getDisplayName())
-                    .concat(" ").concat(c.getPhoneNumber())
-                    .concat(" ").concat(c.getEmail());
+                    var contactProperties = c.getFirstName()
+                            .concat(" ").concat(c.getLastName())
+                            .concat(" ").concat(c.getDisplayName())
+                            .concat(" ").concat(c.getPhoneNumber())
+                            .concat(" ").concat(c.getEmail());
 
-            return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
-        })
+                    return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
+                })
                 .map(ContactEntity::clone)
                 .map(c -> (Contact) c)
                 .toList();

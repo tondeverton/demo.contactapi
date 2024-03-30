@@ -285,7 +285,7 @@ public class StaticContactRepositoryTest {
             "email"
     })
     void add__givenSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
-        var contact = FakerFactory.contactToInsert();
+        var contact = spy(FakerFactory.contactToInsert());
         switch (blankAttribute) {
             case "firstName":
                 when(contact.getFirstName()).thenReturn("");
@@ -317,7 +317,7 @@ public class StaticContactRepositoryTest {
             "email"
     })
     void update__givenAnyIdAndAndSomeContactToInsertWithBlankAttribute__shouldThrowsExceptionSpecificByBlankAttribute(String blankAttribute) {
-        var contact = FakerFactory.contactToInsert();
+        var contact = spy(FakerFactory.contactToInsert());
         switch (blankAttribute) {
             case "firstName":
                 when(contact.getFirstName()).thenReturn("");
