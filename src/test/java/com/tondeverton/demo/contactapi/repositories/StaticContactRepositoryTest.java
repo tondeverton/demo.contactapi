@@ -255,6 +255,27 @@ public class StaticContactRepositoryTest {
         assertEquals(expectedContactProperties, contactPropertiesCaptor.getValue());
     }
 
+    @Test
+    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsAClonedListWithClonedItems() {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
+
+        var anyMinPercentSimilarity = (double) Faker.intBetween(5, 95);
+        when(stringSimilarity.percentageBetween(anyString(), anyString())).thenReturn(anyMinPercentSimilarity);
+        var contactsFromRepository = repository.getAllBySearch(Faker.word(), anyMinPercentSimilarity);
+
+        assertNotEquals(identityHashCode(StaticContactRepository.contacts), identityHashCode(contactsFromRepository));
+
+        var contactsAsArray = StaticContactRepository.contacts.toArray();
+        var contactsFromRepositoryAsArray = contactsFromRepository.toArray();
+
+        assertNotEquals(identityHashCode(contactsAsArray[0]), identityHashCode(contactsFromRepositoryAsArray[0]));
+        assertNotEquals(identityHashCode(contactsAsArray[1]), identityHashCode(contactsFromRepositoryAsArray[1]));
+        assertNotEquals(identityHashCode(contactsAsArray[2]), identityHashCode(contactsFromRepositoryAsArray[2]));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             "firstName",

@@ -58,7 +58,10 @@ public class StaticContactRepository implements ContactRepository {
                     .concat(" ").concat(c.getEmail());
 
             return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
-        }).map(c -> (Contact) c).toList();
+        })
+                .map(ContactEntity::clone)
+                .map(c -> (Contact) c)
+                .toList();
     }
 
     @Override
