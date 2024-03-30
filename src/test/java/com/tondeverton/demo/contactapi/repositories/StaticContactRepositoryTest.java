@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
-import java.util.UUID;
 
 import static java.lang.System.identityHashCode;
 import static java.util.UUID.randomUUID;
@@ -112,6 +111,12 @@ public class StaticContactRepositoryTest {
     }
 
     @Test
+    void add_givenNullContact__shouldThrowsExceptionWithMessageOfNull() {
+        var exception = assertThrows(Exception.class, () -> repository.add(null));
+        assertThat(exception.getMessage()).contains("must not be null");
+    }
+
+    @Test
     void getById__givenNonExistentId__shouldReturnsNotPresentOptional() {
         var contact = repository.getById(randomUUID());
 
@@ -164,6 +169,12 @@ public class StaticContactRepositoryTest {
 
         assertNotEquals(0L, contact.getId().getMostSignificantBits());
         assertNotEquals(0L, contact.getId().getLeastSignificantBits());
+    }
+
+    @Test
+    void getById_givenNullId__shouldThrowsExceptionWithMessageOfNull() {
+        var exception = assertThrows(Exception.class, () -> repository.getById(null));
+        assertThat(exception.getMessage()).contains("must not be null");
     }
 
     @Test
@@ -382,6 +393,12 @@ public class StaticContactRepositoryTest {
         assertThat(contactsAsArray[2]).usingRecursiveComparison().isEqualTo(contactToUpdate == 2 ? updated : contactThree);
     }
 
+    @Test
+    void update_givenNullId__shouldThrowsExceptionWithMessageOfNull() {
+        var exception = assertThrows(Exception.class, () -> repository.update(null, FakerFactory.contactEntity()));
+        assertThat(exception.getMessage()).contains("must not be null");
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2})
     void delete__givenExistentId__shouldReturnsTrueAndDeleteOnlyTheMatchedContactGivenThreeStore(int contactToDelete) {
@@ -404,5 +421,11 @@ public class StaticContactRepositoryTest {
         assertEquals(2, StaticContactRepository.contacts.size());
         assertThat(StaticContactRepository.contacts.stream().map(ContactEntity::getId))
                 .containsAll(expectedStoredContactsAfterDelete);
+    }
+
+    @Test
+    void delete_givenNullId__shouldThrowsExceptionWithMessageOfNull() {
+        var exception = assertThrows(Exception.class, () -> repository.deleteById(null));
+        assertThat(exception.getMessage()).contains("must not be null");
     }
 }

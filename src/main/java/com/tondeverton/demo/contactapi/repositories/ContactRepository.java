@@ -1,6 +1,7 @@
 package com.tondeverton.demo.contactapi.repositories;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
@@ -9,15 +10,15 @@ import java.util.UUID;
 
 @Validated
 public interface ContactRepository {
-    Contact add(@Valid ContactToInsert contact);
+    Contact add(@NotNull @Valid ContactToInsert contact);
 
-    Optional<Contact> getById(UUID id);
+    Optional<Contact> getById(@NotNull UUID id);
 
     Collection<Contact> getAll();
 
     Collection<Contact> getAllBySearch(String search, double minPercentSimilarity);
 
-    Optional<Contact> update(UUID id, @Valid ContactToInsert contact);
+    Optional<Contact> update(@NotNull UUID id, @Valid ContactToInsert contact);
 
-    boolean deleteById(UUID id);
+    boolean deleteById(@NotNull UUID id);
 }
