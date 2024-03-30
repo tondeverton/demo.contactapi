@@ -352,9 +352,10 @@ public class StaticContactRepositoryTest {
 
     @Test
     void update__givenAnyIdAndAnyContactToInsert_shouldNotAddAnotherItemInTheListAndReturnsAClonedContact() {
-        StaticContactRepository.contacts.add(FakerFactory.contactEntity());
+        var contact = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.add(contact);
 
-        var updated = repository.update(randomUUID(), FakerFactory.contactToInsert()).get();
+        var updated = repository.update(contact.getId(), FakerFactory.contactToInsert()).get();
 
         assertEquals(1, StaticContactRepository.contacts.size());
         assertNotEquals(identityHashCode(StaticContactRepository.contacts.toArray()[0]), identityHashCode(updated));
