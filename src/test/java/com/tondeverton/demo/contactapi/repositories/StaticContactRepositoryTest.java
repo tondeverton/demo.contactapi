@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.System.identityHashCode;
 import static java.util.UUID.randomUUID;
@@ -378,5 +379,29 @@ public class StaticContactRepositoryTest {
         assertThat(contactsAsArray[0]).usingRecursiveComparison().isEqualTo(contactToUpdate == 0 ? updated : contactOne);
         assertThat(contactsAsArray[1]).usingRecursiveComparison().isEqualTo(contactToUpdate == 1 ? updated : contactTwo);
         assertThat(contactsAsArray[2]).usingRecursiveComparison().isEqualTo(contactToUpdate == 2 ? updated : contactThree);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void delete__givenExistentId__shouldReturnsTrueAndDeleteOnlyTheMatchedContactGivenThreeStore(int contactToDelete) {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        var contacts = List.of(contactOne, contactTwo, contactThree);
+        StaticContactRepository.contacts.addAll(contacts);
+
+        var contactIdToDelete = contactToDelete == 0 ? contactOne.getId() :
+                contactToDelete == 1 ? contactTwo.getId() :
+                        contactThree.getId();
+
+        var expectedStoredContactsAfterDelete = contacts.stream()
+                .map(ContactEntity::getId).filter(id -> !id.equals(contactIdToDelete)).toList();
+
+        var wasDeleted = repository.deleteById(contactIdToDelete);
+
+        assertTrue(wasDeleted);
+        assertEquals(2, StaticContactRepository.contacts.size());
+        assertThat(StaticContactRepository.contacts.stream().map(ContactEntity::getId))
+                .containsAll(expectedStoredContactsAfterDelete);
     }
 }
