@@ -12,10 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.System.*;
+import static java.lang.System.identityHashCode;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,6 +66,16 @@ public class StaticContactRepositoryTest {
         assertNotNull(persisted.getId());
         assertNotEquals(0L, persisted.getId().getMostSignificantBits());
         assertNotEquals(0L, persisted.getId().getLeastSignificantBits());
+    }
+
+    @Test
+    void add__givenAnyContactToInsert_shouldStoresOnlyOneContactAndReturnsClonedContact() {
+        var toInsert = FakerFactory.contactToInsert();
+
+        var persisted = repository.add(toInsert);
+
+        assertEquals(1, StaticContactRepository.contacts.size());
+        assertNotEquals(identityHashCode(StaticContactRepository.contacts.toArray()[0]), identityHashCode(persisted));
     }
 
     @Test
@@ -338,5 +347,36 @@ public class StaticContactRepositoryTest {
 
         var exception = assertThrows(Exception.class, () -> repository.update(randomUUID(), contact));
         assertTrue(exception.getMessage().contains(blankAttribute));
+    }
+
+    @Test
+    void update__givenAnyIdAndAnyContactToInsert_shouldNotAddAnotherItemInTheListAndReturnsAClonedContact() {
+        StaticContactRepository.contacts.add(FakerFactory.contactEntity());
+
+        var updated = repository.update(randomUUID(), FakerFactory.contactToInsert()).get();
+
+        assertEquals(1, StaticContactRepository.contacts.size());
+        assertNotEquals(identityHashCode(StaticContactRepository.contacts.toArray()[0]), identityHashCode(updated));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void update__givenSomeExistentIdAndSomeContactToInsert_shouldUpdateOnlyTheMatchedContactGivenThreeStored(int contactToUpdate) {
+        var contactOne = FakerFactory.contactEntity();
+        var contactTwo = FakerFactory.contactEntity();
+        var contactThree = FakerFactory.contactEntity();
+        StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
+
+        var updated = repository.update(
+                contactToUpdate == 0 ? contactOne.getId() :
+                        contactToUpdate == 1 ? contactTwo.getId() : contactThree.getId(),
+                FakerFactory.contactToInsert()
+        ).get();
+
+        var contactsAsArray = StaticContactRepository.contacts.toArray();
+
+        assertThat(contactsAsArray[0]).usingRecursiveComparison().isEqualTo(contactToUpdate == 0 ? updated : contactOne);
+        assertThat(contactsAsArray[1]).usingRecursiveComparison().isEqualTo(contactToUpdate == 1 ? updated : contactTwo);
+        assertThat(contactsAsArray[2]).usingRecursiveComparison().isEqualTo(contactToUpdate == 2 ? updated : contactThree);
     }
 }

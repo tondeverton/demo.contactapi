@@ -38,7 +38,7 @@ public class StaticContactRepository implements ContactRepository {
 
         contacts.add(contact);
 
-        return contact;
+        return contact.clone();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public Optional<Contact> update(UUID id, ContactToInsert toInsert) {
-        var contact = contacts.stream().findFirst();
+        var contact = contacts.stream().filter(c -> c.getId().equals(id)).findFirst();
         contact.ifPresent(c -> {
             c.setFirstName(toInsert.getFirstName());
             c.setLastName(toInsert.getLastName());
@@ -77,7 +77,7 @@ public class StaticContactRepository implements ContactRepository {
             c.setPhoneNumber(toInsert.getPhoneNumber());
             c.setEmail(toInsert.getEmail());
         });
-        return contact.map(c -> c);
+        return contact.map(ContactEntity::clone);
     }
 
     @Override
