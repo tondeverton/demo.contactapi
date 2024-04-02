@@ -12,7 +12,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     private String email;
 
     @Override
-    public UUID id() {
+    public UUID getId() {
         return id;
     }
 
@@ -21,7 +21,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     }
 
     @Override
-    public String firstName() {
+    public String getFirstName() {
         return firstName;
     }
 
@@ -30,7 +30,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     }
 
     @Override
-    public String lastName() {
+    public String getLastName() {
         return lastName;
     }
 
@@ -39,7 +39,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     }
 
     @Override
-    public String displayName() {
+    public String getDisplayName() {
         return displayName;
     }
 
@@ -48,7 +48,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     }
 
     @Override
-    public String phoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
@@ -57,7 +57,7 @@ public class ContactEntity implements Contact, ContactToInsert, Cloneable {
     }
 
     @Override
-    public String email() {
+    public String getEmail() {
         return email;
     }
 

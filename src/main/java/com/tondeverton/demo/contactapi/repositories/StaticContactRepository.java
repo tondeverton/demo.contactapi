@@ -28,11 +28,11 @@ public class StaticContactRepository implements ContactRepository {
     @Override
     public Contact add(ContactToInsert toInsert) {
         var contact = new ContactEntity();
-        contact.setFirstName(toInsert.firstName());
-        contact.setLastName(toInsert.lastName());
-        contact.setDisplayName(toInsert.displayName());
-        contact.setPhoneNumber(toInsert.phoneNumber());
-        contact.setEmail(toInsert.email());
+        contact.setFirstName(toInsert.getFirstName());
+        contact.setLastName(toInsert.getLastName());
+        contact.setDisplayName(toInsert.getDisplayName());
+        contact.setPhoneNumber(toInsert.getPhoneNumber());
+        contact.setEmail(toInsert.getEmail());
 
         contact.setId(randomUUID());
 
@@ -43,7 +43,7 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public Optional<Contact> getById(UUID id) {
-        return contacts.stream().filter(c -> id.equals(c.id())).findFirst().map(c -> c);
+        return contacts.stream().filter(c -> id.equals(c.getId())).findFirst().map(c -> c);
     }
 
     @Override
@@ -54,11 +54,11 @@ public class StaticContactRepository implements ContactRepository {
     @Override
     public Collection<Contact> getAllBySearch(String search, double minPercentSimilarity) {
         return contacts.stream().filter(c -> {
-                    var contactProperties = c.firstName()
-                            .concat(" ").concat(c.lastName())
-                            .concat(" ").concat(c.displayName())
-                            .concat(" ").concat(c.phoneNumber())
-                            .concat(" ").concat(c.email());
+                    var contactProperties = c.getFirstName()
+                            .concat(" ").concat(c.getLastName())
+                            .concat(" ").concat(c.getDisplayName())
+                            .concat(" ").concat(c.getPhoneNumber())
+                            .concat(" ").concat(c.getEmail());
 
                     return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
                 })
@@ -69,19 +69,19 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public Optional<Contact> update(UUID id, ContactToInsert toInsert) {
-        var contact = contacts.stream().filter(c -> c.id().equals(id)).findFirst();
+        var contact = contacts.stream().filter(c -> c.getId().equals(id)).findFirst();
         contact.ifPresent(c -> {
-            c.setFirstName(toInsert.firstName());
-            c.setLastName(toInsert.lastName());
-            c.setDisplayName(toInsert.displayName());
-            c.setPhoneNumber(toInsert.phoneNumber());
-            c.setEmail(toInsert.email());
+            c.setFirstName(toInsert.getFirstName());
+            c.setLastName(toInsert.getLastName());
+            c.setDisplayName(toInsert.getDisplayName());
+            c.setPhoneNumber(toInsert.getPhoneNumber());
+            c.setEmail(toInsert.getEmail());
         });
         return contact.map(ContactEntity::clone);
     }
 
     @Override
     public boolean deleteById(UUID id) {
-        return contacts.removeIf(c -> id.equals(c.id()));
+        return contacts.removeIf(c -> id.equals(c.getId()));
     }
 }

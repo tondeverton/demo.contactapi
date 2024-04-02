@@ -8,22 +8,22 @@ import org.hibernate.validator.constraints.Length;
 public interface ContactToInsert {
     @NotBlank
     @Length(max = 30)
-    String firstName();
+    String getFirstName();
 
     @NotBlank
     @Length(max = 30)
-    String lastName();
+    String getLastName();
 
     @NotBlank
     @Length(max = 15)
-    String displayName();
+    String getDisplayName();
 
     @NotBlank
     @Length(max = 20)
     @PhoneNumber
-    String phoneNumber();
+    String getPhoneNumber();
 
     @NotBlank
     @Email
-    String email();
+    String getEmail();
 }
