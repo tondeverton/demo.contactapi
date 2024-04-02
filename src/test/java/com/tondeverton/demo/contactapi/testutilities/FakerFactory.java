@@ -1,7 +1,7 @@
 package com.tondeverton.demo.contactapi.testutilities;
 
 import com.tondeverton.demo.contactapi.repositories.ContactEntity;
-import com.tondeverton.demo.contactapi.repositories.ContactToInsert;
+import com.tondeverton.demo.contactapi.repositories.ContactToSave;
 
 import java.util.UUID;
 
@@ -19,8 +19,8 @@ public class FakerFactory {
         return contact;
     }
 
-    public static ContactToInsert contactToInsert() {
-        return new ContactToInsert() {
+    public static ContactToSave contactToSave() {
+        return new ContactToSave() {
             @Override
             public String getFirstName() {
                 return Faker.firstName();

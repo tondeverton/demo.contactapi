@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Validated
 public interface ContactRepository {
-    Contact add(@NotNull @Valid ContactToInsert contact);
+    Contact add(@NotNull @Valid ContactToSave contact);
 
     Optional<Contact> getById(@NotNull UUID id);
 
@@ -18,7 +18,7 @@ public interface ContactRepository {
 
     Collection<Contact> getAllBySearch(String search, double minPercentSimilarity);
 
-    Optional<Contact> update(@NotNull UUID id, @Valid ContactToInsert contact);
+    Optional<Contact> update(@NotNull UUID id, @Valid ContactToSave contact);
 
     boolean deleteById(@NotNull UUID id);
 }

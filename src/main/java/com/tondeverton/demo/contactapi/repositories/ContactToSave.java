@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
-public interface ContactToInsert {
+public interface ContactToSave {
     @NotBlank
     @Length(max = 30)
     String getFirstName();

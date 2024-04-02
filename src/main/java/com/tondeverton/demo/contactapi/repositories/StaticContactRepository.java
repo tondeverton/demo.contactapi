@@ -26,13 +26,13 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Contact add(ContactToInsert toInsert) {
+    public Contact add(ContactToSave toSave) {
         var contact = new ContactEntity();
-        contact.setFirstName(toInsert.getFirstName());
-        contact.setLastName(toInsert.getLastName());
-        contact.setDisplayName(toInsert.getDisplayName());
-        contact.setPhoneNumber(toInsert.getPhoneNumber());
-        contact.setEmail(toInsert.getEmail());
+        contact.setFirstName(toSave.getFirstName());
+        contact.setLastName(toSave.getLastName());
+        contact.setDisplayName(toSave.getDisplayName());
+        contact.setPhoneNumber(toSave.getPhoneNumber());
+        contact.setEmail(toSave.getEmail());
 
         contact.setId(randomUUID());
 
@@ -68,14 +68,14 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Optional<Contact> update(UUID id, ContactToInsert toInsert) {
+    public Optional<Contact> update(UUID id, ContactToSave toSave) {
         var contact = contacts.stream().filter(c -> c.getId().equals(id)).findFirst();
         contact.ifPresent(c -> {
-            c.setFirstName(toInsert.getFirstName());
-            c.setLastName(toInsert.getLastName());
-            c.setDisplayName(toInsert.getDisplayName());
-            c.setPhoneNumber(toInsert.getPhoneNumber());
-            c.setEmail(toInsert.getEmail());
+            c.setFirstName(toSave.getFirstName());
+            c.setLastName(toSave.getLastName());
+            c.setDisplayName(toSave.getDisplayName());
+            c.setPhoneNumber(toSave.getPhoneNumber());
+            c.setEmail(toSave.getEmail());
         });
         return contact.map(ContactEntity::clone);
     }
