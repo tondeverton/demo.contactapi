@@ -20,13 +20,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("org.postgresql:postgresql")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.graphql:spring-graphql-test")
     testImplementation("org.fluttercode.datafactory:datafactory:0.8")
     testImplementation("org.assertj:assertj-core:3.25.3")
+
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {
