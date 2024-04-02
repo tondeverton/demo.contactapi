@@ -2,7 +2,7 @@ package com.tondeverton.demo.contactapi.repositories;
 
 import java.util.UUID;
 
-public class ContactEntity implements Contact, ContactToInsert, Cloneable {
+public class ContactEntity implements Contact, Cloneable {
 
     private UUID id;
     private String firstName;

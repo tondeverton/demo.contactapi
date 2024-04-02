@@ -5,9 +5,6 @@ import com.tondeverton.demo.contactapi.repositories.ContactToInsert;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class FakerFactory {
 
     public static ContactEntity contactEntity() {
@@ -20,5 +17,34 @@ public class FakerFactory {
         contact.setEmail(Faker.email());
 
         return contact;
+    }
+
+    public static ContactToInsert contactToInsert() {
+        return new ContactToInsert() {
+            @Override
+            public String getFirstName() {
+                return Faker.firstName();
+            }
+
+            @Override
+            public String getLastName() {
+                return Faker.lastName();
+            }
+
+            @Override
+            public String getDisplayName() {
+                return Faker.nickname();
+            }
+
+            @Override
+            public String getPhoneNumber() {
+                return Faker.phoneNumber();
+            }
+
+            @Override
+            public String getEmail() {
+                return Faker.email();
+            }
+        };
     }
 }
