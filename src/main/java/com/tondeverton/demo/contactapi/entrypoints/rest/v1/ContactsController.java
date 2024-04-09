@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/v1/contacts")
@@ -21,7 +22,7 @@ public class ContactsController {
         this.contactsUseCase = contactsUseCase;
     }
 
-    @PostMapping
+    @PostMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     public Contact save(@Valid @NotNull @RequestBody SaveContactRequest request) {
         return contactsUseCase.save(request);

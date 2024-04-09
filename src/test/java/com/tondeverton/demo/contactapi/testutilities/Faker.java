@@ -23,7 +23,7 @@ public class Faker {
     }
 
     public static String email() {
-        return dataFactory.getEmailAddress();
+        return dataFactory.getEmailAddress().replace(" ", "");
     }
 
     public static String word() {
