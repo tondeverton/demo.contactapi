@@ -8,7 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -26,5 +29,11 @@ public class ContactsController {
     @ResponseStatus(CREATED)
     public Contact save(@Valid @NotNull @RequestBody SaveContactRequest request) {
         return contactsUseCase.save(request);
+    }
+
+    @PutMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(OK)
+    public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
+        return contactsUseCase.update(id, request);
     }
 }
