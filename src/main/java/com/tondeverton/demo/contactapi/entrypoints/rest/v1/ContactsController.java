@@ -1,17 +1,19 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
+import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -33,7 +35,11 @@ public class ContactsController {
 
     @PutMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
-        return contactsUseCase.update(id, request);
+    public ResponseEntity<Contact> update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
+        Optional<Contact> optional = contactsUseCase.update(id, request);
+        if (optional.isPresent())
+            return ResponseEntity.of(optional);
+
+        throw new PreconditionException("Contact not found");
     }
 }

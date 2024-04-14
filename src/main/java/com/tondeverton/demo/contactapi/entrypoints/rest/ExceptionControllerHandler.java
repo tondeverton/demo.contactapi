@@ -1,11 +1,13 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest;
 
+import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -22,6 +24,14 @@ public class ExceptionControllerHandler {
 
         if (exception instanceof HttpRequestMethodNotSupportedException) {
             return ResponseEntity.status(METHOD_NOT_ALLOWED).build();
+        }
+
+        if (exception instanceof PreconditionException) {
+            var body = isNotBlank(exception.getMessage())
+                    ? new MessageResponse(exception.getMessage())
+                    : null;
+            return ResponseEntity.status(PRECONDITION_FAILED)
+                    .body(body);
         }
 
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)

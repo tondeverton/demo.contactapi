@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,7 +26,7 @@ public class ContactsUseCase {
         return contactRepository.add(dto);
     }
 
-    public Contact update(@NotNull UUID id, @NotNull @Valid SaveContactRequest request) {
+    public Optional<Contact> update(@NotNull UUID id, @NotNull @Valid SaveContactRequest request) {
         return null;
     }
 }

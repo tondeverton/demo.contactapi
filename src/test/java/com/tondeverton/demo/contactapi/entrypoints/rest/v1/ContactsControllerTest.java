@@ -13,6 +13,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -143,7 +144,7 @@ public class ContactsControllerTest {
 
         var contactId = UUID.randomUUID();
 
-        when(contactsUseCase.update(any(), any())).thenReturn(FakerFactory.contactEntity());
+        when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
         var post = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
@@ -173,7 +174,7 @@ public class ContactsControllerTest {
 
         var contactId = UUID.randomUUID();
 
-        when(contactsUseCase.update(any(), any())).thenReturn(FakerFactory.contactEntity());
+        when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
         var post = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
@@ -202,7 +203,7 @@ public class ContactsControllerTest {
 
         var contactId = UUID.randomUUID();
 
-        when(contactsUseCase.update(any(), any())).thenReturn(FakerFactory.contactEntity());
+        when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
         var post = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
@@ -212,5 +213,36 @@ public class ContactsControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
         assertThat(message).isEqualTo("Invalid request");
+    }
+
+    @Test
+    void PUTContacts_givenNonexistentContactIdAndAnyValidContact_shouldReturnsStatusCode412WithSpecificErrorMessage() {
+        var firstName = Faker.firstName();
+        var lastName = Faker.lastName();
+        var displayName = Faker.nickname();
+        var phoneNumber = Faker.phoneNumber();
+        var email = Faker.email();
+
+        var request = format("""
+                {
+                "first_name": "%s",
+                "last_name": "%s",
+                "display_name": "%s",
+                "phone_number": "%s",
+                "email": "%s"
+                }""", firstName, lastName, displayName, phoneNumber, email);
+
+        var contactId = UUID.randomUUID();
+
+        when(contactsUseCase.update(any(), any())).thenReturn(Optional.empty());
+
+        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+                .contentType(APPLICATION_JSON)
+                .body(request);
+        var response = this.restTemplate.exchange(post, Object.class);
+        var message = JsonPath.read(response.getBody(), "$.message");
+
+        assertThat(response.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+        assertThat(message).isEqualTo("Contact not found");
     }
 }
