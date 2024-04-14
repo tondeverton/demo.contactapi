@@ -153,4 +153,64 @@ public class ContactsControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
     }
+
+    @Test
+    void PUTContacts_givenExistentContactIdAndAnyInvalidContact_shouldReturnsStatusCode400WithSpecificErrorMessage() {
+        var firstName = Faker.firstName();
+        var lastName = Faker.lastName();
+        var displayName = Faker.nickname();
+        var wrongPhoneNumber = "My number:".concat(Faker.phoneNumber());
+        var email = Faker.email();
+
+        var request = format("""
+                {
+                "first_name": "%s",
+                "last_name": "%s",
+                "display_name": "%s",
+                "phone_number": "%s",
+                "email": "%s"
+                }""", firstName, lastName, displayName, wrongPhoneNumber, email);
+
+        var contactId = UUID.randomUUID();
+
+        when(contactsUseCase.update(any(), any())).thenReturn(FakerFactory.contactEntity());
+
+        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+                .contentType(APPLICATION_JSON)
+                .body(request);
+        var response = this.restTemplate.exchange(post, Object.class);
+        var message = JsonPath.read(response.getBody(), "$.message");
+
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(message).isEqualTo("Invalid request");
+    }
+
+    @Test
+    void PUTContacts_givenExistentContactIdAndAnyContactWithoutRequiredData_shouldReturnsStatusCode400WithSpecificErrorMessage() {
+        var firstName = Faker.firstName();
+        var lastName = Faker.lastName();
+        var phoneNumber = Faker.phoneNumber();
+        var email = Faker.email();
+
+        var request = format("""
+                {
+                "first_name": "%s",
+                "last_name": "%s",
+                "phone_number": "%s",
+                "email": "%s"
+                }""", firstName, lastName, phoneNumber, email);
+
+        var contactId = UUID.randomUUID();
+
+        when(contactsUseCase.update(any(), any())).thenReturn(FakerFactory.contactEntity());
+
+        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+                .contentType(APPLICATION_JSON)
+                .body(request);
+        var response = this.restTemplate.exchange(post, Object.class);
+        var message = JsonPath.read(response.getBody(), "$.message");
+
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(message).isEqualTo("Invalid request");
+    }
 }
