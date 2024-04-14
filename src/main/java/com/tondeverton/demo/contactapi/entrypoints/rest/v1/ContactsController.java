@@ -35,11 +35,7 @@ public class ContactsController {
 
     @PutMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public ResponseEntity<Contact> update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
-        Optional<Contact> optional = contactsUseCase.update(id, request);
-        if (optional.isPresent())
-            return ResponseEntity.of(optional);
-
-        throw new PreconditionException("Contact not found");
+    public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
+        return contactsUseCase.update(id, request).orElseThrow(() -> new PreconditionException("Contact not found"));
     }
 }
