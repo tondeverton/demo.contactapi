@@ -25,8 +25,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.RequestEntity.post;
-import static org.springframework.http.RequestEntity.put;
+import static org.springframework.http.RequestEntity.*;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ContactsControllerTest {
@@ -244,5 +243,26 @@ public class ContactsControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
         assertThat(message).isEqualTo("Contact not found");
+    }
+
+    @Test
+    void GETContacts_givenAnyExistentId_shouldReturnsStatusCode200AndJSONBody() {
+        var existentContactId = UUID.randomUUID().toString();
+        when(contactsUseCase.get(any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
+
+        var response = restTemplate.exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+    }
+
+    @Test
+    void GETContacts_givenANonexistentId_shouldReturnsStatusCode204() {
+        var existentContactId = UUID.randomUUID().toString();
+        when(contactsUseCase.get(any())).thenReturn(Optional.empty());
+
+        var response = restTemplate.exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
     }
 }

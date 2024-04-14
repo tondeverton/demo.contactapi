@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
@@ -37,5 +36,11 @@ public class ContactsController {
     @ResponseStatus(OK)
     public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
         return contactsUseCase.update(id, request).orElseThrow(() -> new PreconditionException("Contact not found"));
+    }
+
+    @GetMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(OK)
+    public ResponseEntity<Contact> get(@NotNull @PathVariable UUID id) {
+        return contactsUseCase.get(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(NO_CONTENT).build());
     }
 }

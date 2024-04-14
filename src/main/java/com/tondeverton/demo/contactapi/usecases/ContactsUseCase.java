@@ -29,4 +29,8 @@ public class ContactsUseCase {
     public Optional<Contact> update(@NotNull UUID id, @NotNull @Valid SaveContactRequest request) {
         return null;
     }
+
+    public Optional<Contact> get(@NotNull UUID id) {
+        return null;
+    }
 }
