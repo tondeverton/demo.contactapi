@@ -1,6 +1,7 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import com.tondeverton.demo.contactapi.testutilities.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -63,11 +63,11 @@ public class ContactsControllerTest {
 
 
     @Test
-    void POSTContacts_givenAnyInvalidContact_shouldReturnsStatusCode400() {
+    void POSTContacts_givenAnyInvalidContactData_shouldReturnsStatusCode400WithSpecificErrorMessage() {
         var firstName = Faker.firstName();
         var lastName = Faker.lastName();
         var displayName = Faker.nickname();
-        var wrongPhoneNumber = Faker.phoneNumber().contains(Faker.word());
+        var wrongPhoneNumber = "My number: ".concat(Faker.phoneNumber());
         var email = Faker.email();
 
         var request = format("""
@@ -82,8 +82,35 @@ public class ContactsControllerTest {
         var post = post(uriTemplate)
                 .contentType(APPLICATION_JSON)
                 .body(request);
-        var response = this.restTemplate.exchange(post, LinkedHashMap.class);
+        var response = this.restTemplate.exchange(post, String.class);
+        var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(message).isEqualTo("Invalid request");
+    }
+
+    @Test
+    void POSTContacts_givenAnyContactWithoutRequiredData_shouldReturnsStatusCode400WithSpecificErrorMessage() {
+        var firstName = Faker.firstName();
+        var lastName = Faker.lastName();
+        var phoneNumber = Faker.phoneNumber();
+        var email = Faker.email();
+
+        var request = format("""
+                {
+                "first_name": "%s",
+                "last_name": "%s",
+                "phone_number": "%s",
+                "email": "%s"
+                }""", firstName, lastName, phoneNumber, email);
+
+        var post = post(uriTemplate)
+                .contentType(APPLICATION_JSON)
+                .body(request);
+        var response = this.restTemplate.exchange(post, String.class);
+        var message = JsonPath.read(response.getBody(), "$.message");
+
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+        assertThat(message).isEqualTo("Invalid request");
     }
 }
