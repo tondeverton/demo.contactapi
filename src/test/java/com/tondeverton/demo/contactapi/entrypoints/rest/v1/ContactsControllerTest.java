@@ -14,23 +14,26 @@ import java.util.List;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.RequestEntity.post;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 public class ContactsControllerTest {
-
-    @LocalServerPort
-    private int port;
 
     @Autowired
     private TestRestTemplate restTemplate;
-
     @Autowired
     private ObjectMapper mapper;
+
+    private final String uriTemplate;
+
+    public ContactsControllerTest(@LocalServerPort int port) {
+        uriTemplate = format("http://localhost:%s/v1/contacts", port);
+    }
 
     @Test
     void POSTContacts_givenAnyValidContact_shouldReturnsStatusCode201WithJSONBody() {
@@ -49,13 +52,12 @@ public class ContactsControllerTest {
                 "email": "%s"
                 }""", firstName, lastName, displayName, phoneNumber, email);
 
-        var post = post(format("http://localhost:%s/v1/contacts", port))
+        var post = post(uriTemplate)
                 .contentType(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
                 .body(request);
         var response = this.restTemplate.exchange(post, Object.class);
 
-        assertThat(response.getStatusCode().value()).isEqualTo(CREATED.value());
+        assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
     }
 
@@ -77,11 +79,11 @@ public class ContactsControllerTest {
                 "email": "%s"
                 }""", firstName, lastName, displayName, wrongPhoneNumber, email);
 
-        var post = post(format("http://localhost:%s/v1/contacts", port))
+        var post = post(uriTemplate)
                 .contentType(APPLICATION_JSON)
                 .body(request);
         var response = this.restTemplate.exchange(post, LinkedHashMap.class);
 
-        assertThat(response.getStatusCode().value()).isEqualTo(BAD_REQUEST.value());
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 }
