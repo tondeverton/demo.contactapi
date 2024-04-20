@@ -72,10 +72,8 @@ public class ContactsControllerTest {
 
         when(contactsUseCase.save(any())).thenReturn(FakerFactory.contactEntity());
 
-        var post = post(uriTemplate)
-                .contentType(APPLICATION_JSON)
-                .body(request);
-        var response = this.restTemplate.exchange(post, Object.class);
+        var response = restTemplate
+                .exchange(post(uriTemplate).contentType(APPLICATION_JSON).body(request), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
@@ -98,10 +96,8 @@ public class ContactsControllerTest {
                 "email": "%s"
                 }""", firstName, lastName, displayName, wrongPhoneNumber, email);
 
-        var post = post(uriTemplate)
-                .contentType(APPLICATION_JSON)
-                .body(request);
-        var response = this.restTemplate.exchange(post, String.class);
+        var response = restTemplate
+                .exchange(post(uriTemplate).contentType(APPLICATION_JSON).body(request), String.class);
         var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -123,10 +119,8 @@ public class ContactsControllerTest {
                 "email": "%s"
                 }""", firstName, lastName, phoneNumber, email);
 
-        var post = post(uriTemplate)
-                .contentType(APPLICATION_JSON)
-                .body(request);
-        var response = this.restTemplate.exchange(post, String.class);
+        var response = restTemplate
+                .exchange(post(uriTemplate).contentType(APPLICATION_JSON).body(request), String.class);
         var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -154,10 +148,9 @@ public class ContactsControllerTest {
 
         when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
-        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
-                .contentType(APPLICATION_JSON)
-                .body(request);
-        var response = this.restTemplate.exchange(post, Object.class);
+        var requestEntity = put(uriTemplate.concat("/").concat(contactId.toString()))
+                .contentType(APPLICATION_JSON).body(request);
+        var response = restTemplate.exchange(requestEntity, Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
@@ -184,10 +177,10 @@ public class ContactsControllerTest {
 
         when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
-        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+        var requestEntity = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
                 .body(request);
-        var response = this.restTemplate.exchange(post, Object.class);
+        var response = restTemplate.exchange(requestEntity, Object.class);
         var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -213,10 +206,10 @@ public class ContactsControllerTest {
 
         when(contactsUseCase.update(any(), any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
-        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+        var requestEntity = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
                 .body(request);
-        var response = this.restTemplate.exchange(post, Object.class);
+        var response = restTemplate.exchange(requestEntity, Object.class);
         var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -244,10 +237,10 @@ public class ContactsControllerTest {
 
         when(contactsUseCase.update(any(), any())).thenReturn(Optional.empty());
 
-        var post = put(uriTemplate.concat("/").concat(contactId.toString()))
+        var requestEntity = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON)
                 .body(request);
-        var response = this.restTemplate.exchange(post, Object.class);
+        var response = restTemplate.exchange(requestEntity, Object.class);
         var message = JsonPath.read(response.getBody(), "$.message");
 
         assertThat(response.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
@@ -259,7 +252,8 @@ public class ContactsControllerTest {
         var existentContactId = UUID.randomUUID().toString();
         when(contactsUseCase.get(any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
-        var response = restTemplate.exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
+        var response = restTemplate
+                .exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
@@ -270,7 +264,8 @@ public class ContactsControllerTest {
         var existentContactId = UUID.randomUUID().toString();
         when(contactsUseCase.get(any())).thenReturn(Optional.empty());
 
-        var response = restTemplate.exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
+        var response = restTemplate
+                .exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
     }
