@@ -50,8 +50,12 @@ public class ContactsController {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public GetAllContactsResponse getAll(
-            @RequestParam(required = false, defaultValue = "") @Length(max = 50) String search,
-            @RequestParam(required = false, defaultValue = "0") @Max(30) int page
+            @RequestParam(required = false, defaultValue = "")
+            @Length(max = 50)
+            String search,
+            @RequestParam(required = false, defaultValue = "0")
+            @Max(30)
+            int page
     ) {
         var contactsPage = contactsUseCase.getAll(search, page);
 
