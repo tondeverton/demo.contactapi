@@ -27,6 +27,7 @@ import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -275,13 +276,17 @@ public class ContactsControllerTest {
     }
 
     @Test
-    void GETAllContacts_withoutAnyParam_shouldReturnsStatusCode200WithJSONBody() {
+    void GETAllContacts_withoutAnyParam_shouldReturnsStatusCode200WithExpectedJSONBodyPaths() {
         when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
 
         var response = restTemplate.exchange(get(uriTemplate).build(), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.page"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
     }
 
     @Test
@@ -314,14 +319,19 @@ public class ContactsControllerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {11, 23, 31, 49, 50})
-    void GETAllContacts_withSearchLowerThenOrEqualTo50Characters_shouldReturns200(int stringSize) {
+    void GETAllContacts_withSearchLowerThenOrEqualTo50Characters_shouldReturns200WithExpectedJSONBodyPaths(int stringSize) {
         var search = URLEncoder.encode(Faker.text(stringSize), defaultCharset());
 
         when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
 
         var response = restTemplate.exchange(get(uriTemplate.concat("?search=").concat(search)).build(), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.page"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
     }
 
     @ParameterizedTest
@@ -334,12 +344,17 @@ public class ContactsControllerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {7, 9, 11, 29, 30})
-    void GETAllContacts_withPageLowerThenOrEqualTo30_shouldReturns200(int page) {
+    void GETAllContacts_withPageLowerThenOrEqualTo30_shouldReturns200WithExpectedJSONBodyPaths(int page) {
         when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
 
         var response = restTemplate.exchange(get(uriTemplate.concat(format("?page=%d", page))).build(), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.page"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
     }
 
     @ParameterizedTest
@@ -350,14 +365,19 @@ public class ContactsControllerTest {
             "49, 29",
             "50, 30"
     })
-    void GETAllContacts_withValidSearchAndValidPage_shouldReturns200(int searchStringSize, int page) {
+    void GETAllContacts_withValidSearchAndValidPage_shouldReturns200WithExpectedJSONBodyPaths(int searchStringSize, int page) {
         var search = URLEncoder.encode(Faker.text(searchStringSize), defaultCharset());
 
         when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
 
         var uri = uriTemplate.concat(format("?search=%s&page=%d", search, page));
         var response = restTemplate.exchange(get(uri).build(), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.page"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
     }
 }
