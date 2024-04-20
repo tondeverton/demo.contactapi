@@ -1,6 +1,7 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest;
 
 import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +17,10 @@ public class ExceptionControllerHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<MessageResponse> exception(Exception exception) {
-        if (exception instanceof MethodArgumentNotValidException) {
+        if (
+                exception instanceof MethodArgumentNotValidException
+                || exception instanceof ConstraintViolationException
+        ) {
             return ResponseEntity.status(BAD_REQUEST)
                     .header("Content-Type", APPLICATION_JSON_VALUE)
                     .body(new MessageResponse("Invalid request"));
