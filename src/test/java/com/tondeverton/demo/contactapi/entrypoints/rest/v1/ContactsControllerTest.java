@@ -2,24 +2,31 @@ package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.testutilities.Faker;
 import com.tondeverton.demo.contactapi.testutilities.FakerFactory;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.domain.Page;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.*;
@@ -264,5 +271,73 @@ public class ContactsControllerTest {
         var response = restTemplate.exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
+    }
+
+    @Test
+    void GETAllContacts_withoutAnyParam_shouldReturnsStatusCode200WithJSONBody() {
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
+
+        var response = restTemplate.exchange(get(uriTemplate).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+    }
+
+    @Test
+    void GETAllContacts_withoutAnyParam_shouldReturnsJSONBodyWithPageAndTotalPagesFromUseCaseReturn() {
+        var expectedPage = 3;
+        var expectedTotalPages = 10;
+        Page<Contact> pageContacts = Mockito.mock();
+        when(pageContacts.getNumber()).thenReturn(expectedPage);
+        when(pageContacts.getTotalPages()).thenReturn(expectedTotalPages);
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(pageContacts);
+
+        var response = restTemplate.exchange(get(uriTemplate).build(), Object.class);
+        var body = response.getBody();
+        var page = JsonPath.read(body, "$.page");
+        var totalPages = JsonPath.read(body, "$.total_pages");
+
+        assertThat(page).isEqualTo(expectedPage);
+        assertThat(totalPages).isEqualTo(expectedTotalPages);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {51, 60, 95, 1110})
+    void GETAllContacts_withSearchBiggerThen50Characters_shouldReturns400(int stringSize) {
+        var search = URLEncoder.encode(Faker.text(stringSize), defaultCharset());
+
+        var response = restTemplate.exchange(get(uriTemplate.concat("?search=").concat(search)).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {11, 23, 31, 49, 50})
+    void GETAllContacts_withSearchLowerThenOrEqualTo50Characters_shouldReturns200(int stringSize) {
+        var search = URLEncoder.encode(Faker.text(stringSize), defaultCharset());
+
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
+
+        var response = restTemplate.exchange(get(uriTemplate.concat("?search=").concat(search)).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {31, 47, 88, 6789123})
+    void GETAllContacts_withPageBiggerThen30_shouldReturns400(int page) {
+        var response = restTemplate.exchange(get(uriTemplate.concat(format("?page=%d", page))).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {7, 9, 11, 29, 30})
+    void GETAllContacts_withPageLowerThenOrEqualTo30_shouldReturns200(int page) {
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
+
+        var response = restTemplate.exchange(get(uriTemplate.concat(format("?page=%d", page))).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
     }
 }

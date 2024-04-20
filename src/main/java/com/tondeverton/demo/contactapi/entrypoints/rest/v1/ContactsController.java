@@ -1,11 +1,14 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
+import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.GetAllContactsResponse;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
 import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -42,5 +45,20 @@ public class ContactsController {
     @ResponseStatus(OK)
     public ResponseEntity<Contact> get(@NotNull @PathVariable UUID id) {
         return contactsUseCase.get(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(NO_CONTENT).build());
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(OK)
+    public GetAllContactsResponse getAll(
+            @RequestParam(required = false, defaultValue = "") @Length(max = 50) String search,
+            @RequestParam(required = false, defaultValue = "0") @Max(30) int page
+    ) {
+        var contactsPage = contactsUseCase.getAll(search, page);
+
+        return new GetAllContactsResponse(
+                contactsPage.getNumber(),
+                contactsPage.getTotalPages(),
+                contactsPage.get().toList()
+        );
     }
 }

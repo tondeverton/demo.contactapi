@@ -34,6 +34,10 @@ public class Faker {
         return dataFactory.getRandomWord(length);
     }
 
+    public static String text(int length) {
+        return dataFactory.getRandomText(length);
+    }
+
     public static String number(int digits) {
         return dataFactory.getNumberText(digits);
     }
