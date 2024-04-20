@@ -8,6 +8,7 @@ import com.tondeverton.demo.contactapi.testutilities.FakerFactory;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,6 +338,25 @@ public class ContactsControllerTest {
         when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
 
         var response = restTemplate.exchange(get(uriTemplate.concat(format("?page=%d", page))).build(), Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "11, 7",
+            "23, 9",
+            "31, 11",
+            "49, 29",
+            "50, 30"
+    })
+    void GETAllContacts_withValidSearchAndValidPage_shouldReturns200(int searchStringSize, int page) {
+        var search = URLEncoder.encode(Faker.text(searchStringSize), defaultCharset());
+
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
+
+        var uri = uriTemplate.concat(format("?search=%s&page=%d", search, page));
+        var response = restTemplate.exchange(get(uri).build(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
     }
