@@ -51,7 +51,7 @@ public class ContactsControllerTest {
     private final String uriTemplate;
 
     public ContactsControllerTest(@LocalServerPort int port) {
-        uriTemplate = format("http://localhost:%s/v1/contacts", port);
+        uriTemplate = format("http://localhost:%s/api/v1/contacts", port);
     }
 
     @Test
