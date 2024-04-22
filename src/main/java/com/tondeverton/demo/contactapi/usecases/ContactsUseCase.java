@@ -41,4 +41,8 @@ public class ContactsUseCase {
     public Page<Contact> getAll(String search, int page) {
         return null;
     }
+
+    public Optional<Boolean> delete(@NotNull UUID id) {
+        return Optional.empty();
+    }
 }

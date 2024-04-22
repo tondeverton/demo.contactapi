@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
@@ -64,5 +65,18 @@ public class ContactsController {
                 contactsPage.getTotalPages(),
                 contactsPage.get().toList()
         );
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void delete(@NotNull @PathVariable UUID id) {
+        var wasDeletedOption = contactsUseCase.delete(id);
+        if (wasDeletedOption.isEmpty())
+            throw new PreconditionException("Contact not found");
+
+        if (wasDeletedOption.get())
+            return;
+
+        throw new RuntimeException();
     }
 }

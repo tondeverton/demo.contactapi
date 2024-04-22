@@ -405,4 +405,26 @@ public class ContactsControllerTest {
         assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
         assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
     }
+
+    @Test
+    void DELETEContacts_withExistentId_shouldReturns204() {
+        when(contactsUseCase.delete(any())).thenReturn(Optional.of(true));
+
+        var request = delete(uriTemplate.concat("/").concat(UUID.randomUUID().toString())).build();
+
+        var response = restTemplate.exchange(request, Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(NO_CONTENT);
+    }
+
+    @Test
+    void DELETEContacts_withNonExistentId_shouldReturns412() {
+        when(contactsUseCase.delete(any())).thenReturn(Optional.empty());
+
+        var request = delete(uriTemplate.concat("/").concat(UUID.randomUUID().toString())).build();
+
+        var response = restTemplate.exchange(request, Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(PRECONDITION_FAILED);
+    }
 }
