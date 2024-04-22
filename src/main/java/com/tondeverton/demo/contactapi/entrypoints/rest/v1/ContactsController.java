@@ -3,7 +3,6 @@ package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.GetAllContactsResponse;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
 import com.tondeverton.demo.contactapi.exceptions.ContactNotFoundException;
-import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import jakarta.validation.Valid;
