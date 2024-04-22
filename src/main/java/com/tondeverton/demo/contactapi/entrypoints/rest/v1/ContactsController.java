@@ -2,6 +2,7 @@ package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.GetAllContactsResponse;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
+import com.tondeverton.demo.contactapi.exceptions.ContactNotFoundException;
 import com.tondeverton.demo.contactapi.exceptions.PreconditionException;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
@@ -39,7 +39,7 @@ public class ContactsController {
     @PutMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
-        return contactsUseCase.update(id, request).orElseThrow(() -> new PreconditionException("Contact not found"));
+        return contactsUseCase.update(id, request).orElseThrow(ContactNotFoundException::new);
     }
 
     @GetMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
@@ -70,11 +70,9 @@ public class ContactsController {
     @DeleteMapping("{id}")
     @ResponseStatus(NO_CONTENT)
     public void delete(@NotNull @PathVariable UUID id) {
-        var wasDeletedOption = contactsUseCase.delete(id);
-        if (wasDeletedOption.isEmpty())
-            throw new PreconditionException("Contact not found");
+        var wasDeleted = contactsUseCase.delete(id).orElseThrow(ContactNotFoundException::new);
 
-        if (wasDeletedOption.get())
+        if (wasDeleted)
             return;
 
         throw new RuntimeException();
