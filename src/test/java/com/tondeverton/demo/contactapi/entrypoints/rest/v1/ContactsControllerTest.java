@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
@@ -54,7 +55,7 @@ public class ContactsControllerTest {
     }
 
     @Test
-    void POSTContacts_givenAnyValidContact_shouldReturnsStatusCode201WithJSONBody() {
+    void POSTContacts_givenAnyValidContact_shouldReturnsStatusCode201WithExpectedJSONBodyPaths() {
         var firstName = Faker.firstName();
         var lastName = Faker.lastName();
         var displayName = Faker.nickname();
@@ -74,9 +75,16 @@ public class ContactsControllerTest {
 
         var response = restTemplate
                 .exchange(post(uriTemplate).contentType(APPLICATION_JSON).body(request), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.id"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.first_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.last_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.display_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.phone_number"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.email"));
     }
 
     @Test
@@ -128,7 +136,7 @@ public class ContactsControllerTest {
     }
 
     @Test
-    void PUTContacts_givenExistentContactIdAndAnyValidContact_shouldReturnsStatusCode200WithJSONBody() {
+    void PUTContacts_givenExistentContactIdAndAnyValidContact_shouldReturnsStatusCode200WithExpectedJSONBodyPaths() {
         var firstName = Faker.firstName();
         var lastName = Faker.lastName();
         var displayName = Faker.nickname();
@@ -151,9 +159,16 @@ public class ContactsControllerTest {
         var requestEntity = put(uriTemplate.concat("/").concat(contactId.toString()))
                 .contentType(APPLICATION_JSON).body(request);
         var response = restTemplate.exchange(requestEntity, Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.id"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.first_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.last_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.display_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.phone_number"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.email"));
     }
 
     @Test
@@ -248,15 +263,22 @@ public class ContactsControllerTest {
     }
 
     @Test
-    void GETContacts_givenAnyExistentId_shouldReturnsStatusCode200AndJSONBody() {
+    void GETContacts_givenAnyExistentId_shouldReturnsStatusCode200AndExpectedJSONBodyPaths() {
         var existentContactId = UUID.randomUUID().toString();
         when(contactsUseCase.get(any())).thenReturn(Optional.of(FakerFactory.contactEntity()));
 
         var response = restTemplate
                 .exchange(get(uriTemplate.concat("/").concat(existentContactId)).build(), Object.class);
+        var body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders()).contains(entry("Content-Type", List.of(APPLICATION_JSON_VALUE)));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.id"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.first_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.last_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.display_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.phone_number"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.email"));
     }
 
     @Test
@@ -272,7 +294,9 @@ public class ContactsControllerTest {
 
     @Test
     void GETAllContacts_withoutAnyParam_shouldReturnsStatusCode200WithExpectedJSONBodyPaths() {
-        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(Page.empty());
+        Page<Contact> mock = Mockito.mock();
+        when(mock.get()).thenReturn(Stream.of(FakerFactory.contactEntity()));
+        when(contactsUseCase.getAll(anyString(), anyInt())).thenReturn(mock);
 
         var response = restTemplate.exchange(get(uriTemplate).build(), Object.class);
         var body = response.getBody();
@@ -282,6 +306,12 @@ public class ContactsControllerTest {
         assertDoesNotThrow(() -> JsonPath.read(body, "$.page"));
         assertDoesNotThrow(() -> JsonPath.read(body, "$.total_pages"));
         assertDoesNotThrow(() -> JsonPath.read(body, "$.items"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].id"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].first_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].last_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].display_name"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].phone_number"));
+        assertDoesNotThrow(() -> JsonPath.read(body, "$.items[0].email"));
     }
 
     @Test
