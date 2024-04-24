@@ -1,4 +1,10 @@
 server:
+  port: 8443
+  ssl:
+    key-store: demo-contactapi-keystore.p12
+    key-store-password: ${DEMO_CONTACTAPI_KEYSTORE_PASSWORD}
+    key-store-type: PKCS12
+    key-alias: democontactapi
   servlet:
     context-path: /api
 
