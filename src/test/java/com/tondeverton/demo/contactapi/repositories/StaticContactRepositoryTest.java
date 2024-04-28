@@ -184,7 +184,7 @@ public class StaticContactRepositoryTest {
         var contactThree = FakerFactory.contactEntity();
         StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
 
-        var contacts = repository.getAll().toArray();
+        var contacts = repository.getAll().get().toArray();
 
         assertEquals(3, contacts.length);
         assertThat(contacts[0]).usingRecursiveComparison().isEqualTo(contactOne);
@@ -204,7 +204,7 @@ public class StaticContactRepositoryTest {
         assertNotEquals(identityHashCode(StaticContactRepository.contacts), identityHashCode(contactsFromRepository));
 
         var contactsAsArray = StaticContactRepository.contacts.toArray();
-        var contactsFromRepositoryAsArray = contactsFromRepository.toArray();
+        var contactsFromRepositoryAsArray = contactsFromRepository.get().toArray();
 
         assertNotEquals(identityHashCode(contactsAsArray[0]), identityHashCode(contactsFromRepositoryAsArray[0]));
         assertNotEquals(identityHashCode(contactsAsArray[1]), identityHashCode(contactsFromRepositoryAsArray[1]));
@@ -213,7 +213,7 @@ public class StaticContactRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3})
-    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentGreaterThanMinOfThreeExistentContacts(
+    void getAll__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentGreaterThanMinOfThreeExistentContacts(
             int contactToReturn
     ) {
         var contactOne = repository.add(FakerFactory.contactToSave());
@@ -232,9 +232,9 @@ public class StaticContactRepositoryTest {
                         contactToReturn == 3 ? greaterThanPercentSimilarity : lowerThanPercentSimilarity
                 );
 
-        var contacts = repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+        var contacts = repository.getAll(anySearch, anyMinPercentSimilarity);
 
-        assertEquals(1, contacts.size());
+        assertEquals(1, contacts.getTotalElements());
 
         var contactId = contacts.stream().findFirst().get().getId();
         switch (contactToReturn) {
@@ -252,7 +252,7 @@ public class StaticContactRepositoryTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3})
-    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentEqualToMinOfThreeExistentContacts(
+    void getAll__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsOnlyOneWithPercentEqualToMinOfThreeExistentContacts(
             int contactToReturn
     ) {
         var contactOne = repository.add(FakerFactory.contactToSave());
@@ -270,9 +270,9 @@ public class StaticContactRepositoryTest {
                         contactToReturn == 3 ? anyMinPercentSimilarity : lowerThanPercentSimilarity
                 );
 
-        var contacts = repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+        var contacts = repository.getAll(anySearch, anyMinPercentSimilarity);
 
-        assertEquals(1, contacts.size());
+        assertEquals(1, contacts.getTotalElements());
 
         var contactId = contacts.stream().findFirst().get().getId();
         switch (contactToReturn) {
@@ -289,7 +289,7 @@ public class StaticContactRepositoryTest {
     }
 
     @Test
-    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldProvidesForStringSimilarityAllDataFromContactToSave() {
+    void getAll__givenAnySearchAndAnyMinPercentSimilarity__shouldProvidesForStringSimilarityAllDataFromContactToSave() {
         var contact = repository.add(FakerFactory.contactToSave());
         var expectedContactProperties = contact.getFirstName()
                 .concat(" ").concat(contact.getLastName())
@@ -303,13 +303,13 @@ public class StaticContactRepositoryTest {
         var contactPropertiesCaptor = ArgumentCaptor.forClass(String.class);
 
         when(stringSimilarity.percentageBetween(anyString(), contactPropertiesCaptor.capture())).thenReturn(anyMinPercentSimilarity);
-        repository.getAllBySearch(anySearch, anyMinPercentSimilarity);
+        repository.getAll(anySearch, anyMinPercentSimilarity);
 
         assertEquals(expectedContactProperties, contactPropertiesCaptor.getValue());
     }
 
     @Test
-    void getAllBySearch__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsAClonedListWithClonedItems() {
+    void getAll__givenAnySearchAndAnyMinPercentSimilarity__shouldReturnsAClonedListWithClonedItems() {
         var contactOne = FakerFactory.contactEntity();
         var contactTwo = FakerFactory.contactEntity();
         var contactThree = FakerFactory.contactEntity();
@@ -317,12 +317,12 @@ public class StaticContactRepositoryTest {
 
         var anyMinPercentSimilarity = (double) Faker.intBetween(5, 95);
         when(stringSimilarity.percentageBetween(anyString(), anyString())).thenReturn(anyMinPercentSimilarity);
-        var contactsFromRepository = repository.getAllBySearch(Faker.word(), anyMinPercentSimilarity);
+        var contactsFromRepository = repository.getAll(Faker.word(), anyMinPercentSimilarity);
 
         assertNotEquals(identityHashCode(StaticContactRepository.contacts), identityHashCode(contactsFromRepository));
 
         var contactsAsArray = StaticContactRepository.contacts.toArray();
-        var contactsFromRepositoryAsArray = contactsFromRepository.toArray();
+        var contactsFromRepositoryAsArray = contactsFromRepository.get().toArray();
 
         assertNotEquals(identityHashCode(contactsAsArray[0]), identityHashCode(contactsFromRepositoryAsArray[0]));
         assertNotEquals(identityHashCode(contactsAsArray[1]), identityHashCode(contactsFromRepositoryAsArray[1]));

@@ -1,16 +1,22 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import com.tondeverton.demo.contactapi.utilities.PageConverter;
+import com.tondeverton.demo.contactapi.utilities.PageConverterUtil;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityLevenshtein;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Repository
 public class StaticContactRepository implements ContactRepository {
@@ -18,11 +24,14 @@ public class StaticContactRepository implements ContactRepository {
     protected static final Collection<ContactEntity> contacts = new ArrayList<>();
 
     private final StringSimilarityUtil stringSimilarity;
+    private final PageConverterUtil pageConverter;
 
     public StaticContactRepository(
-            @Autowired(required = false) StringSimilarityUtil stringSimilarity
+            @Autowired(required = false) StringSimilarityUtil stringSimilarity,
+            @Autowired(required = false) PageConverterUtil pageConverter
     ) {
         this.stringSimilarity = stringSimilarity == null ? new StringSimilarityLevenshtein() : stringSimilarity;
+        this.pageConverter = pageConverter == null ? new PageConverter() : pageConverter;
     }
 
     @Override
@@ -47,24 +56,38 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Collection<Contact> getAll() {
-        return contacts.stream().map(ContactEntity::clone).map(c -> (Contact) c).toList();
+    public Page<Contact> getAll() {
+        return this.getAll(0, 30, "", 0);
     }
 
     @Override
-    public Collection<Contact> getAllBySearch(String search, double minPercentSimilarity) {
-        return contacts.stream().filter(c -> {
-                    var contactProperties = c.getFirstName()
-                            .concat(" ").concat(c.getLastName())
-                            .concat(" ").concat(c.getDisplayName())
-                            .concat(" ").concat(c.getPhoneNumber())
-                            .concat(" ").concat(c.getEmail());
+    public Page<Contact> getAll(String search, double minPercentSimilarity) {
+        return this.getAll(0, 30, search, minPercentSimilarity);
+    }
 
-                    return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
-                })
+    @Override
+    public Page<Contact> getAll(int page, int pageSize) {
+        return this.getAll(page, pageSize, "", 0);
+    }
+
+    @Override
+    public Page<Contact> getAll(int page, int pageSize, String search, double minPercentSimilarity) {
+        Predicate<ContactEntity> filterBySearch = isNotBlank(search)
+                ? c -> {
+            var contactProperties = format(
+                    "%s %s %s %s %s",
+                    c.getFirstName(), c.getLastName(), c.getDisplayName(), c.getPhoneNumber(), c.getEmail()
+            );
+
+            return stringSimilarity.percentageBetween(search, contactProperties) >= minPercentSimilarity;
+        }
+                : c -> true;
+
+        var contacts = StaticContactRepository.contacts.stream().filter(filterBySearch)
                 .map(ContactEntity::clone)
                 .map(c -> (Contact) c)
                 .toList();
+        return pageConverter.collectionToPage(contacts, page, pageSize);
     }
 
     @Override
