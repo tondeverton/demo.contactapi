@@ -15,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
+
 @Service
 @Validated
 public class ContactsUseCase {
@@ -38,7 +40,19 @@ public class ContactsUseCase {
     }
 
     public Page<Contact> getAll(@Length(max = 50) String search, @Max(30) int page) {
-        return null;
+        if (isBlank(search) && page <= 0) {
+            return contactRepository.getAll();
+        }
+
+        if (isBlank(search)) {
+            return contactRepository.getAll(page, 30);
+        }
+
+        if (page <= 0) {
+            return contactRepository.getAll(search, 60);
+        }
+
+        return contactRepository.getAll(page, 30, search, 60);
     }
 
     public Optional<Boolean> delete(@NotNull UUID id) {
