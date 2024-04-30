@@ -1,6 +1,9 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.tondeverton.demo.contactapi.repositories.ContactToSave;
+
+import static com.tondeverton.demo.contactapi.utilities.Regex.getRegexUtil;
 
 public class SaveContactRequest implements ContactToSave {
     private String firstName;
@@ -9,11 +12,12 @@ public class SaveContactRequest implements ContactToSave {
     private String phoneNumber;
     private String email;
 
+    @JsonCreator
     public SaveContactRequest(String firstName, String lastName, String displayName, String phoneNumber, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.displayName = displayName;
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber = getRegexUtil().removeAlphaCharacter(phoneNumber);
         this.email = email;
     }
 
