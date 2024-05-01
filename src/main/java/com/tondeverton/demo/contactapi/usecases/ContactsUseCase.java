@@ -1,6 +1,6 @@
 package com.tondeverton.demo.contactapi.usecases;
 
-import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
+import com.tondeverton.demo.contactapi.providers.VariableProvider;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.repositories.ContactRepository;
 import com.tondeverton.demo.contactapi.repositories.ContactToSave;
@@ -15,6 +15,8 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.tondeverton.demo.contactapi.providers.Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE;
+import static com.tondeverton.demo.contactapi.providers.Variables.CONTACTS_SEARCH_MIN_PERCENT_SIMILARITY;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 
 @Service
@@ -22,9 +24,11 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 public class ContactsUseCase {
 
     private final ContactRepository contactRepository;
+    private final VariableProvider variableProvider;
 
-    public ContactsUseCase(ContactRepository contactRepository) {
+    public ContactsUseCase(ContactRepository contactRepository, VariableProvider variableProvider) {
         this.contactRepository = contactRepository;
+        this.variableProvider = variableProvider;
     }
 
     public Contact save(@NotNull @Valid ContactToSave dto) {
@@ -44,15 +48,17 @@ public class ContactsUseCase {
             return contactRepository.getAll();
         }
 
+        var maxPageSize = variableProvider.getValueAsInt(CONTACTS_SEARCH_MAX_PAGE_SIZE);
         if (isBlank(search)) {
-            return contactRepository.getAll(page, 30);
+            return contactRepository.getAll(page, maxPageSize);
         }
 
+        var minPercentSimilarity = variableProvider.getValueAsInt(CONTACTS_SEARCH_MIN_PERCENT_SIMILARITY);
         if (page <= 0) {
-            return contactRepository.getAll(search, 60);
+            return contactRepository.getAll(search, minPercentSimilarity);
         }
 
-        return contactRepository.getAll(page, 30, search, 60);
+        return contactRepository.getAll(page, maxPageSize, search, minPercentSimilarity);
     }
 
     public Optional<Boolean> delete(@NotNull UUID id) {
