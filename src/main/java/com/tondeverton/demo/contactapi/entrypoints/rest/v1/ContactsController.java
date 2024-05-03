@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
 @RequestMapping("/v1/contacts")
@@ -44,7 +45,7 @@ public class ContactsController {
     @GetMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public ResponseEntity<Contact> get(@NotNull @PathVariable UUID id) {
-        return contactsUseCase.get(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(NO_CONTENT).build());
+        return contactsUseCase.get(id).map(ResponseEntity::ok).orElseGet(() -> noContent().build());
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
