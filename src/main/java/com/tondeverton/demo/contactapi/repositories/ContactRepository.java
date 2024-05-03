@@ -1,5 +1,7 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import com.tondeverton.demo.contactapi.validators.ContactsSearchPageSize;
+import com.tondeverton.demo.contactapi.validators.ContactsSearchString;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -19,14 +21,17 @@ public interface ContactRepository {
 
     Page<Contact> getAll();
 
-    Page<Contact> getAll(@NotBlank String search, @Min(0) @Max(100) double minPercentSimilarity);
+    Page<Contact> getAll(
+            @NotBlank @ContactsSearchString String search,
+            @Min(0) @Max(100) double minPercentSimilarity
+    );
 
-    Page<Contact> getAll(@Min(1) @Max(30) int page, int pageSize);
+    Page<Contact> getAll(@Min(1) @ContactsSearchPageSize int page, int pageSize);
 
     Page<Contact> getAll(
-            @Min(1) @Max(30) int page,
+            @Min(1) @ContactsSearchPageSize int page,
             int pageSize,
-            @NotBlank String search,
+            @NotBlank @ContactsSearchString String search,
             @Min(0) @Max(100) double minPercentSimilarity
     );
 

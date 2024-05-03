@@ -4,10 +4,10 @@ import com.tondeverton.demo.contactapi.providers.VariableProvider;
 import com.tondeverton.demo.contactapi.repositories.Contact;
 import com.tondeverton.demo.contactapi.repositories.ContactRepository;
 import com.tondeverton.demo.contactapi.repositories.ContactToSave;
+import com.tondeverton.demo.contactapi.validators.ContactsSearchPageSize;
+import com.tondeverton.demo.contactapi.validators.ContactsSearchString;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +43,7 @@ public class ContactsUseCase {
         return contactRepository.getById(id);
     }
 
-    public Page<Contact> getAll(@Length(max = 50) String search, @Max(30) int page) {
+    public Page<Contact> getAll(@ContactsSearchString String search, @ContactsSearchPageSize int page) {
         if (isBlank(search) && page <= 0) {
             return contactRepository.getAll();
         }
