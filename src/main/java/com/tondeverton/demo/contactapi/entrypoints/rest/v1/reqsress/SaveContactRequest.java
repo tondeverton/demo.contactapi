@@ -6,11 +6,11 @@ import com.tondeverton.demo.contactapi.repositories.ContactToSave;
 import static com.tondeverton.demo.contactapi.utilities.Regex.getRegexUtil;
 
 public class SaveContactRequest implements ContactToSave {
-    private String firstName;
-    private String lastName;
-    private String displayName;
-    private String phoneNumber;
-    private String email;
+    private final String firstName;
+    private final String lastName;
+    private final String displayName;
+    private final String phoneNumber;
+    private final String email;
 
     @JsonCreator
     public SaveContactRequest(String firstName, String lastName, String displayName, String phoneNumber, String email) {

@@ -8,7 +8,6 @@ import com.tondeverton.demo.contactapi.usecases.ContactsUseCase;
 import com.tondeverton.demo.contactapi.validators.ContactsSearchPageSize;
 import com.tondeverton.demo.contactapi.validators.ContactsSearchString;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
