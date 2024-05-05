@@ -1,5 +1,7 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import com.tondeverton.demo.contactapi.providers.VariableProvider;
+import com.tondeverton.demo.contactapi.providers.Variables;
 import com.tondeverton.demo.contactapi.utilities.PageConverter;
 import com.tondeverton.demo.contactapi.utilities.PageConverterUtil;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityLevenshtein;
@@ -25,13 +27,16 @@ public class StaticContactRepository implements ContactRepository {
 
     private final StringSimilarityUtil stringSimilarity;
     private final PageConverterUtil pageConverter;
+    private final VariableProvider variableProvider;
 
     public StaticContactRepository(
             @Autowired(required = false) StringSimilarityUtil stringSimilarity,
-            @Autowired(required = false) PageConverterUtil pageConverter
+            @Autowired(required = false) PageConverterUtil pageConverter,
+            VariableProvider variableProvider
     ) {
         this.stringSimilarity = stringSimilarity == null ? new StringSimilarityLevenshtein() : stringSimilarity;
         this.pageConverter = pageConverter == null ? new PageConverter() : pageConverter;
+        this.variableProvider = variableProvider;
     }
 
     @Override
@@ -57,12 +62,14 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public Page<Contact> getAll() {
-        return this.getAll(0, 30, "", 0);
+        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        return this.getAll(0, maxPageSize, "", 0);
     }
 
     @Override
     public Page<Contact> getAll(String search, double minPercentSimilarity) {
-        return this.getAll(0, 30, search, minPercentSimilarity);
+        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        return this.getAll(0, maxPageSize, search, minPercentSimilarity);
     }
 
     @Override
