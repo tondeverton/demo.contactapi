@@ -44,8 +44,7 @@ public class ExceptionControllerHandler {
         var body = isNotBlank(exception.getMessage())
                 ? new MessageResponse(exception.getMessage())
                 : null;
-        return ResponseEntity.status(PRECONDITION_FAILED)
-                .body(body);
+        return ResponseEntity.status(PRECONDITION_FAILED).body(body);
     }
 
     private static ResponseEntity<MessageResponse> badRequest() {
