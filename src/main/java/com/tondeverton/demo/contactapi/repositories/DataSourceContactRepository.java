@@ -65,12 +65,33 @@ public class DataSourceContactRepository implements ContactRepository {
     }
 
     @Override
-    public Optional<Contact> update(UUID id, ContactToSave contact) {
-        return Optional.empty();
+    public Optional<Contact> update(UUID identifier, ContactToSave toUpdate) {
+        var id = repository.findIdByIdentifier(identifier);
+        if (id.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var contact = new ContactDataSource();
+        contact.setFirstName(toUpdate.getFirstName());
+        contact.setLastName(toUpdate.getLastName());
+        contact.setDisplayName(toUpdate.getDisplayName());
+        contact.setPhoneNumber(toUpdate.getPhoneNumber());
+        contact.setEmail(toUpdate.getEmail());
+
+        contact.setId(id.get());
+
+        return Optional.of(repository.save(contact));
     }
 
     @Override
-    public boolean deleteById(UUID id) {
-        return false;
+    public boolean deleteById(UUID identifier) {
+        var id = repository.findIdByIdentifier(identifier);
+        if (id.isEmpty()) {
+            return false;
+        }
+
+        repository.deleteById(id.get());
+
+        return true;
     }
 }

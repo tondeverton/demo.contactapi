@@ -15,6 +15,8 @@ interface CrudContactRepository extends CrudRepository<ContactDataSource, Long>,
 
     Optional<ContactDataSource> findByIdentifier(UUID identifier);
 
+    Optional<Long> findIdByIdentifier(UUID identifier);
+
     @Query(value = """
             SELECT *, COUNT(*) OVER() AS total_count FROM contacts
             WHERE levenshtein(:search, concat(firstName, lastName, displayName, phoneNumber, email)) <= :maxDistance
