@@ -1,6 +1,9 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import com.tondeverton.demo.contactapi.providers.VariableProvider;
+import com.tondeverton.demo.contactapi.providers.Variables;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -10,9 +13,11 @@ import java.util.UUID;
 public class DataSourceContactRepository implements ContactRepository {
 
     private final CrudContactRepository repository;
+    private final VariableProvider variableProvider;
 
-    public DataSourceContactRepository(CrudContactRepository repository) {
+    public DataSourceContactRepository(CrudContactRepository repository, VariableProvider variableProvider) {
         this.repository = repository;
+        this.variableProvider = variableProvider;
     }
 
     @Override
@@ -36,22 +41,27 @@ public class DataSourceContactRepository implements ContactRepository {
 
     @Override
     public Page<Contact> getAll() {
-        return null;
+        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        return this.getAll(0, maxPageSize, "", 0);
     }
 
     @Override
     public Page<Contact> getAll(String search, double minPercentSimilarity) {
-        return null;
+        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        return this.getAll(0, maxPageSize, search, minPercentSimilarity);
     }
 
     @Override
     public Page<Contact> getAll(int page, int pageSize) {
-        return null;
+        return this.getAll(page, pageSize, "", 0);
     }
 
     @Override
     public Page<Contact> getAll(int page, int pageSize, String search, double minPercentSimilarity) {
-        return null;
+        // TODO: calc maxDistance
+        return repository.findByLevenshteinSimilarity(search, 30, PageRequest.of(page, pageSize))
+                .map(ContactEntity::clone)
+                .map(c -> c);
     }
 
     @Override
