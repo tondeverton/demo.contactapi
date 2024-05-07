@@ -48,7 +48,7 @@ public class StaticContactRepository implements ContactRepository {
         contact.setPhoneNumber(toSave.getPhoneNumber());
         contact.setEmail(toSave.getEmail());
 
-        contact.setId(randomUUID());
+        contact.setIdentifier(randomUUID());
 
         contacts.add(contact);
 
@@ -56,8 +56,8 @@ public class StaticContactRepository implements ContactRepository {
     }
 
     @Override
-    public Optional<Contact> getById(UUID id) {
-        return contacts.stream().filter(c -> id.equals(c.getId())).findFirst().map(c -> c);
+    public Optional<Contact> getByIdentifier(UUID id) {
+        return contacts.stream().filter(c -> id.equals(c.getIdentifier())).findFirst().map(c -> c);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public Optional<Contact> update(UUID id, ContactToSave toSave) {
-        var contact = contacts.stream().filter(c -> c.getId().equals(id)).findFirst();
+        var contact = contacts.stream().filter(c -> c.getIdentifier().equals(id)).findFirst();
         contact.ifPresent(c -> {
             c.setFirstName(toSave.getFirstName());
             c.setLastName(toSave.getLastName());
@@ -112,6 +112,6 @@ public class StaticContactRepository implements ContactRepository {
 
     @Override
     public boolean deleteById(UUID id) {
-        return contacts.removeIf(c -> id.equals(c.getId()));
+        return contacts.removeIf(c -> id.equals(c.getIdentifier()));
     }
 }

@@ -29,14 +29,14 @@ public class DataSourceContactRepository implements ContactRepository {
         contact.setPhoneNumber(toSave.getPhoneNumber());
         contact.setEmail(toSave.getEmail());
 
-        contact.setId(UUID.randomUUID());
+        contact.setIdentifier(UUID.randomUUID());
 
         return repository.save(contact).clone();
     }
 
     @Override
-    public Optional<Contact> getById(UUID id) {
-        return repository.findById(id).map(c -> c);
+    public Optional<Contact> getByIdentifier(UUID id) {
+        return repository.findByIdentifier(id).map(c -> c);
     }
 
     @Override

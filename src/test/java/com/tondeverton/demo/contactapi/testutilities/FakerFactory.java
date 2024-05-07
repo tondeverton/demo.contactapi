@@ -9,7 +9,7 @@ public class FakerFactory {
 
     public static ContactEntity contactEntity() {
         var contact = new ContactEntity();
-        contact.setId(UUID.randomUUID());
+        contact.setIdentifier(UUID.randomUUID());
         contact.setFirstName(Faker.firstName());
         contact.setLastName(Faker.lastName());
         contact.setDisplayName(Faker.nickname());

@@ -63,9 +63,9 @@ public class StaticContactRepositoryTest {
 
         var persisted = repository.add(toSave);
 
-        assertNotNull(persisted.getId());
-        assertNotEquals(0L, persisted.getId().getMostSignificantBits());
-        assertNotEquals(0L, persisted.getId().getLeastSignificantBits());
+        assertNotNull(persisted.getIdentifier());
+        assertNotEquals(0L, persisted.getIdentifier().getMostSignificantBits());
+        assertNotEquals(0L, persisted.getIdentifier().getLeastSignificantBits());
     }
 
     @Test
@@ -117,25 +117,25 @@ public class StaticContactRepositoryTest {
     }
 
     @Test
-    void getById__givenNonExistentId__shouldReturnsNotPresentOptional() {
-        var contact = repository.getById(randomUUID());
+    void getById__givenNonExistentIdentifier__shouldReturnsNotPresentOptional() {
+        var contact = repository.getByIdentifier(randomUUID());
 
         assertFalse(contact.isPresent());
     }
 
     @Test
-    void getById__givenExistentId__shouldReturnsPresentOptional() {
+    void getById__givenExistentIdentifier__shouldReturnsPresentOptional() {
         var toSave = FakerFactory.contactToSave();
         var persisted = repository.add(toSave);
-        var existentId = persisted.getId();
+        var existentId = persisted.getIdentifier();
 
-        var contact = repository.getById(existentId);
+        var contact = repository.getByIdentifier(existentId);
 
         assertTrue(contact.isPresent());
     }
 
     @Test
-    void getById__givenExistentIdAndEarlierSomeContactAdded__shouldReturnsPresentOptionalWithGivenContactData() {
+    void getById__givenExistentIdentifierAndEarlierSomeContactAdded__shouldReturnsPresentOptionalWithGivenContactData() {
         var toSave = mock(ContactToSave.class);
         var someFirstName = Faker.firstName();
         when(toSave.getFirstName()).thenReturn(someFirstName);
@@ -148,9 +148,9 @@ public class StaticContactRepositoryTest {
         var someEmail = Faker.email();
         when(toSave.getEmail()).thenReturn(someEmail);
 
-        var existentId = repository.add(toSave).getId();
+        var existentId = repository.add(toSave).getIdentifier();
 
-        var contact = repository.getById(existentId).get();
+        var contact = repository.getByIdentifier(existentId).get();
 
         assertEquals(someFirstName, contact.getFirstName());
         assertEquals(someLastName, contact.getLastName());
@@ -160,20 +160,20 @@ public class StaticContactRepositoryTest {
     }
 
     @Test
-    void getById__givenExistentIdAndEarlierAnyContactAdded__shouldReturnsPresentOptionalWithNotBlankId() {
+    void getById__givenExistentIdAndEarlierAnyContactAdded__shouldReturnsPresentOptionalWithNotBlankIdentifier() {
         var toSave = FakerFactory.contactToSave();
 
-        var existentId = repository.add(toSave).getId();
+        var existentId = repository.add(toSave).getIdentifier();
 
-        var contact = repository.getById(existentId).get();
+        var contact = repository.getByIdentifier(existentId).get();
 
-        assertNotEquals(0L, contact.getId().getMostSignificantBits());
-        assertNotEquals(0L, contact.getId().getLeastSignificantBits());
+        assertNotEquals(0L, contact.getIdentifier().getMostSignificantBits());
+        assertNotEquals(0L, contact.getIdentifier().getLeastSignificantBits());
     }
 
     @Test
-    void getById_givenNullId__shouldThrowsExceptionWithMessageOfNull() {
-        var exception = assertThrows(Exception.class, () -> repository.getById(null));
+    void getById_givenNullIdentifier__shouldThrowsExceptionWithMessageOfNull() {
+        var exception = assertThrows(Exception.class, () -> repository.getByIdentifier(null));
         assertThat(exception.getMessage()).contains("must not be null");
     }
 
@@ -236,16 +236,16 @@ public class StaticContactRepositoryTest {
 
         assertEquals(1, contacts.getTotalElements());
 
-        var contactId = contacts.stream().findFirst().get().getId();
+        var contactId = contacts.stream().findFirst().get().getIdentifier();
         switch (contactToReturn) {
             case 1:
-                assertEquals(contactOne.getId(), contactId);
+                assertEquals(contactOne.getIdentifier(), contactId);
                 break;
             case 2:
-                assertEquals(contactTwo.getId(), contactId);
+                assertEquals(contactTwo.getIdentifier(), contactId);
                 break;
             case 3:
-                assertEquals(contactThree.getId(), contactId);
+                assertEquals(contactThree.getIdentifier(), contactId);
                 break;
         }
     }
@@ -274,16 +274,16 @@ public class StaticContactRepositoryTest {
 
         assertEquals(1, contacts.getTotalElements());
 
-        var contactId = contacts.stream().findFirst().get().getId();
+        var contactId = contacts.stream().findFirst().get().getIdentifier();
         switch (contactToReturn) {
             case 1:
-                assertEquals(contactOne.getId(), contactId);
+                assertEquals(contactOne.getIdentifier(), contactId);
                 break;
             case 2:
-                assertEquals(contactTwo.getId(), contactId);
+                assertEquals(contactTwo.getIdentifier(), contactId);
                 break;
             case 3:
-                assertEquals(contactThree.getId(), contactId);
+                assertEquals(contactThree.getIdentifier(), contactId);
                 break;
         }
     }
@@ -366,7 +366,7 @@ public class StaticContactRepositoryTest {
         var contact = FakerFactory.contactEntity();
         StaticContactRepository.contacts.add(contact);
 
-        var updated = repository.update(contact.getId(), FakerFactory.contactToSave()).get();
+        var updated = repository.update(contact.getIdentifier(), FakerFactory.contactToSave()).get();
 
         assertEquals(1, StaticContactRepository.contacts.size());
         assertNotEquals(identityHashCode(StaticContactRepository.contacts.toArray()[0]), identityHashCode(updated));
@@ -381,8 +381,8 @@ public class StaticContactRepositoryTest {
         StaticContactRepository.contacts.addAll(List.of(contactOne, contactTwo, contactThree));
 
         var updated = repository.update(
-                contactToUpdate == 0 ? contactOne.getId() :
-                        contactToUpdate == 1 ? contactTwo.getId() : contactThree.getId(),
+                contactToUpdate == 0 ? contactOne.getIdentifier() :
+                        contactToUpdate == 1 ? contactTwo.getIdentifier() : contactThree.getIdentifier(),
                 FakerFactory.contactToSave()
         ).get();
 
@@ -427,18 +427,18 @@ public class StaticContactRepositoryTest {
         var contacts = List.of(contactOne, contactTwo, contactThree);
         StaticContactRepository.contacts.addAll(contacts);
 
-        var contactIdToDelete = contactToDelete == 0 ? contactOne.getId() :
-                contactToDelete == 1 ? contactTwo.getId() :
-                        contactThree.getId();
+        var contactIdToDelete = contactToDelete == 0 ? contactOne.getIdentifier() :
+                contactToDelete == 1 ? contactTwo.getIdentifier() :
+                        contactThree.getIdentifier();
 
         var expectedStoredContactsAfterDelete = contacts.stream()
-                .map(ContactEntity::getId).filter(id -> !id.equals(contactIdToDelete)).toList();
+                .map(ContactEntity::getIdentifier).filter(id -> !id.equals(contactIdToDelete)).toList();
 
         var wasDeleted = repository.deleteById(contactIdToDelete);
 
         assertTrue(wasDeleted);
         assertEquals(2, StaticContactRepository.contacts.size());
-        assertThat(StaticContactRepository.contacts.stream().map(ContactEntity::getId))
+        assertThat(StaticContactRepository.contacts.stream().map(ContactEntity::getIdentifier))
                 .containsAll(expectedStoredContactsAfterDelete);
     }
 

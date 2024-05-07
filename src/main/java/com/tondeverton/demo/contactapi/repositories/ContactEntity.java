@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class ContactEntity implements Contact, Cloneable {
 
-    private UUID id;
+    private UUID identifier;
     private String firstName;
     private String lastName;
     private String displayName;
@@ -12,12 +12,12 @@ public class ContactEntity implements Contact, Cloneable {
     private String email;
 
     @Override
-    public UUID getId() {
-        return id;
+    public UUID getIdentifier() {
+        return identifier;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setIdentifier(UUID identifier) {
+        this.identifier = identifier;
     }
 
     @Override

@@ -12,13 +12,13 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class ContactDataSource extends ContactEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Long identifier;
+    private Long id;
 
-    public Long getIdentifier() {
-        return identifier;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdentifier(Long identifier) {
-        this.identifier = identifier;
+    public void setId(Long id) {
+        this.id = id;
     }
 }

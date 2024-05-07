@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface ContactRepository {
     Contact add(@NotNull @Valid ContactToSave contact);
 
-    Optional<Contact> getById(@NotNull UUID id);
+    Optional<Contact> getByIdentifier(@NotNull UUID id);
 
     Page<Contact> getAll();
 

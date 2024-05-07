@@ -40,7 +40,7 @@ public class ContactsUseCase {
     }
 
     public Optional<Contact> get(@NotNull UUID id) {
-        return contactRepository.getById(id);
+        return contactRepository.getByIdentifier(id);
     }
 
     public Page<Contact> getAll(@ContactsSearchString String search, @ContactsSearchPageSize int page) {

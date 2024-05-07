@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 interface CrudContactRepository extends CrudRepository<ContactDataSource, Long>, PagingAndSortingRepository<ContactDataSource, Long> {
 
-    Optional<ContactDataSource> findById(UUID id);
+    Optional<ContactDataSource> findByIdentifier(UUID identifier);
 
     @Query(value = """
             SELECT *, COUNT(*) OVER() AS total_count FROM contacts

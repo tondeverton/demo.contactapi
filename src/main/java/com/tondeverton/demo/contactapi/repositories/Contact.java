@@ -3,7 +3,7 @@ package com.tondeverton.demo.contactapi.repositories;
 import java.util.UUID;
 
 public interface Contact {
-    UUID getId();
+    UUID getIdentifier();
 
     String getFirstName();
 
