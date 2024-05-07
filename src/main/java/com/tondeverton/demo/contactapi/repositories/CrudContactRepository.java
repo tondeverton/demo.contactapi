@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-interface CrudContactRepository extends CrudRepository<ContactDataSource, Long>, PagingAndSortingRepository<ContactDataSource, Long> {
+public interface CrudContactRepository extends CrudRepository<ContactDataSource, Long>, PagingAndSortingRepository<ContactDataSource, Long> {
 
     Optional<ContactDataSource> findByIdentifier(UUID identifier);
 
