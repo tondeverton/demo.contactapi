@@ -1,13 +1,14 @@
 package com.tondeverton.demo.contactapi.repositories;
 
 import com.tondeverton.demo.contactapi.providers.VariableProvider;
-import com.tondeverton.demo.contactapi.providers.Variables;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.tondeverton.demo.contactapi.providers.Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE;
 
 @Repository
 public class DataSourceContactRepository implements ContactRepository {
@@ -41,13 +42,13 @@ public class DataSourceContactRepository implements ContactRepository {
 
     @Override
     public Page<Contact> getAll() {
-        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        var maxPageSize = variableProvider.getValueAsInt(CONTACTS_SEARCH_MAX_PAGE_SIZE);
         return this.getAll(0, maxPageSize, "", 0);
     }
 
     @Override
     public Page<Contact> getAll(String search, double minPercentSimilarity) {
-        var maxPageSize = variableProvider.getValueAsInt(Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE);
+        var maxPageSize = variableProvider.getValueAsInt(CONTACTS_SEARCH_MAX_PAGE_SIZE);
         return this.getAll(0, maxPageSize, search, minPercentSimilarity);
     }
 
