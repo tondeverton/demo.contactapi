@@ -1,7 +1,10 @@
 package com.tondeverton.demo.contactapi.repositories;
 
+import jakarta.persistence.MappedSuperclass;
+
 import java.util.UUID;
 
+@MappedSuperclass
 public class ContactEntity implements Contact, Cloneable {
 
     private UUID identifier;
