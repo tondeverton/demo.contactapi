@@ -7,6 +7,7 @@ import com.tondeverton.demo.contactapi.utilities.PageConverterUtil;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityLevenshtein;
 import com.tondeverton.demo.contactapi.utilities.StringSimilarityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,7 @@ import static java.util.UUID.randomUUID;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Repository
+@ConditionalOnProperty(name = "spring.datasource.target", havingValue = "h2")
 public class StaticContactRepository implements ContactRepository {
 
     protected static final Collection<ContactEntity> contacts = new ArrayList<>();

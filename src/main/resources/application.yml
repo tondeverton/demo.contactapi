@@ -13,10 +13,17 @@ spring:
   application:
     name: demo.contactapi
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
+    target: ${DATA_SOURCE_TARGET:static}
+    h2:
+      driver-class-name: org.h2.Driver
+      url: jdbc:h2:mem:testdb
+      username: sa
+      password:
+    postgres:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/mydatabase
+      username: postgres
+      password: mysecretpassword
     jpa:
       hibernate:
         ddl-auto: create-drop

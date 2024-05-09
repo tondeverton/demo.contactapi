@@ -1,6 +1,7 @@
 package com.tondeverton.demo.contactapi.repositories;
 
 import com.tondeverton.demo.contactapi.providers.VariableProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import static com.tondeverton.demo.contactapi.providers.Variables.CONTACTS_SEARCH_MAX_PAGE_SIZE;
 
 @Repository
+@ConditionalOnProperty(name = "spring.datasource.target", havingValue = "static", matchIfMissing = true)
 public class DataSourceContactRepository implements ContactRepository {
 
     private final CrudContactRepository repository;
