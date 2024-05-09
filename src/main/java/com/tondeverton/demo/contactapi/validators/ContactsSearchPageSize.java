@@ -12,7 +12,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({METHOD, FIELD, ANNOTATION_TYPE, PARAMETER})
 @Retention(RUNTIME)
-@Constraint(validatedBy = ContactsSearchStringValidator.class)
+@Constraint(validatedBy = ContactsSearchPageSizeValidator.class)
 @Documented
 public @interface ContactsSearchPageSize {
     String message() default "is not valid page size";
