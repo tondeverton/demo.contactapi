@@ -22,7 +22,7 @@ import static java.util.UUID.randomUUID;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Repository
-@ConditionalOnProperty(name = "spring.datasource.target", havingValue = "h2")
+@ConditionalOnProperty(name = "spring.datasource.target", havingValue = "static")
 public class StaticContactRepository implements ContactRepository {
 
     protected static final Collection<ContactEntity> contacts = new ArrayList<>();
