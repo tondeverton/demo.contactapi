@@ -92,7 +92,7 @@ public class ContactsControllerTest {
         var firstName = Faker.firstName();
         var lastName = Faker.lastName();
         var displayName = Faker.nickname();
-        var wrongPhoneNumber = "My number: ".concat(Faker.phoneNumber());
+        var wrongPhoneNumber = "My number: One two Three";
         var email = Faker.email();
 
         var request = format("""
@@ -176,7 +176,7 @@ public class ContactsControllerTest {
         var firstName = Faker.firstName();
         var lastName = Faker.lastName();
         var displayName = Faker.nickname();
-        var wrongPhoneNumber = "My number:".concat(Faker.phoneNumber());
+        var wrongPhoneNumber = "My number: One two Three";
         var email = Faker.email();
 
         var request = format("""
