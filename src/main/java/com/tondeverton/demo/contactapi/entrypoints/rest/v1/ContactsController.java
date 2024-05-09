@@ -1,5 +1,6 @@
 package com.tondeverton.demo.contactapi.entrypoints.rest.v1;
 
+import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.ContactResponse;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.GetAllContactsResponse;
 import com.tondeverton.demo.contactapi.entrypoints.rest.v1.reqsress.SaveContactRequest;
 import com.tondeverton.demo.contactapi.exceptions.ContactNotFoundException;
@@ -32,20 +33,20 @@ public class ContactsController {
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public Contact save(@Valid @NotNull @RequestBody SaveContactRequest request) {
-        return contactsUseCase.save(request);
+    public ContactResponse save(@Valid @NotNull @RequestBody SaveContactRequest request) {
+        return new ContactResponse(contactsUseCase.save(request));
     }
 
     @PutMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public Contact update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
-        return contactsUseCase.update(id, request).orElseThrow(ContactNotFoundException::new);
+    public ContactResponse update(@NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody SaveContactRequest request) {
+        return contactsUseCase.update(id, request).map(ContactResponse::new).orElseThrow(ContactNotFoundException::new);
     }
 
     @GetMapping(value = "{id}", produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public ResponseEntity<Contact> get(@NotNull @PathVariable UUID id) {
-        return contactsUseCase.get(id).map(ResponseEntity::ok).orElseGet(() -> noContent().build());
+    public ResponseEntity<ContactResponse> get(@NotNull @PathVariable UUID id) {
+        return contactsUseCase.get(id).map(ContactResponse::new).map(ResponseEntity::ok).orElseGet(() -> noContent().build());
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
